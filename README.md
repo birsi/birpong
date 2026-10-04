@@ -34,7 +34,7 @@ npm test          # run the engine tests
 npm run typecheck
 ```
 
-`npm run dev` and `npm run build` are wired up but there is no app to show yet.
+`npm run dev` starts a two-player hot-seat match in the browser (the CPU opponent is not built yet). `npm run build` makes a production bundle.
 
 ## Stack
 
@@ -58,7 +58,7 @@ The engine is a pure, deterministic state machine that knows nothing about rende
 ## Roadmap
 
 1. Rules engine with tests (done)
-2. Table rendering and the drag throw
+2. Table rendering and the drag throw (done, on Phaser 4)
 3. CPU opponent, three levels
 4. Local stats
 5. Online rooms
