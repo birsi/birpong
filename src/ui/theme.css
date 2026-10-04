@@ -1,0 +1,13 @@
+/* Birpong colour tokens (birsi theme). The token names match Tailwind v4 @theme naming. */
+:root {
+  --color-ground-top: #000000;
+  --color-ground-bottom: #323232;
+  --color-surface: #27272a;
+  --color-surface-raised: #3f3f46;
+  --color-text-faint: #52525b;
+  --color-text-muted: #71717a;
+  --color-text: #d4d4d8;
+  --color-text-strong: #ffffff;
+  --color-accent: #27d17f;
+  --color-brand-aws: #ff9900;
+}

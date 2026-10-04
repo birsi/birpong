@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Birpong online lobby</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Silkscreen:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+button,input{font:inherit}
+a{color:#27d17f}a:hover{color:#ffffff}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; box-sizing: border-box; padding: 24px 24px 48px; background: linear-gradient(#000000, #323232); color: #d4d4d8; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<div style="width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 24px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 700; font-size: 24px; line-height: 1; letter-spacing: 0.04em; color: #ffffff">BIRPONG</span>
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid #71717a; border-radius: 3px; padding: 3px 8px">Online · 1 v 1</span>
+</div>
+<a href="home.html" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; text-decoration: none">Leave room</a>
+</header>
+
+<section style="box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Room code</span>
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 700; font-size: clamp(48px, 10vw, 88px); line-height: 1; letter-spacing: 0.12em; color: #ffffff">K7QM</span>
+</div>
+<div style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; overflow-wrap: anywhere">[YOUR-DOMAIN]/r/K7QM</span>
+<button type="button" style="min-height: 44px; padding: 0 16px; background: transparent; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer">Copy invite link</button>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+<section style="flex: 1 1 300px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #000000; background: #27d17f; padding: 2px 6px; border-radius: 3px">YOU</span>
+<span style="font-size: 16px; font-weight: 500; color: #ffffff">birsi</span>
+<span style="font-size: 12px">host</span>
+</div>
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #27d17f">READY</span>
+</section>
+<section style="flex: 1 1 300px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #000000; background: #ff9900; padding: 2px 6px; border-radius: 3px">P2</span>
+<span style="font-size: 16px; font-weight: 500; color: #ffffff">flo</span>
+<span style="font-size: 12px">guest</span>
+</div>
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #ffffff">JOINED</span>
+</section>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+
+<section style="flex: 1 1 380px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 20px; line-height: 1.1; letter-spacing: 0.06em; color: #ffffff">WHO THROWS FIRST</h2>
+<p style="margin: 0; font-size: 13px">Rock, paper, scissors. Best of one.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" aria-pressed="true" style="flex: 1 1 96px; min-height: 56px; background: #3f3f46; color: #ffffff; border: 1px solid #27d17f; border-radius: 4px; font-weight: 700; letter-spacing: 0.1em; cursor: pointer">ROCK</button>
+<button type="button" aria-pressed="false" style="flex: 1 1 96px; min-height: 56px; background: transparent; color: #d4d4d8; border: 1px solid #71717a; border-radius: 4px; letter-spacing: 0.1em; cursor: pointer">PAPER</button>
+<button type="button" aria-pressed="false" style="flex: 1 1 96px; min-height: 56px; background: transparent; color: #d4d4d8; border: 1px solid #71717a; border-radius: 4px; letter-spacing: 0.1em; cursor: pointer">SCISSORS</button>
+</div>
+<p style="margin: 0; font-size: 13px">You picked rock. Waiting for flo.</p>
+</section>
+
+<section style="flex: 1 1 380px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 20px; line-height: 1.1; letter-spacing: 0.06em; color: #ffffff">MATCH RULES</h2>
+<dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; column-gap: 20px; row-gap: 6px; font-size: 13px">
+<dt>Cups</dt><dd style="margin: 0; color: #ffffff">10 each, pyramid 4-3-2-1</dd>
+<dt>Turn</dt><dd style="margin: 0; color: #ffffff">2 balls, both yours</dd>
+<dt>Balls back</dt><dd style="margin: 0; color: #ffffff">both hit, once per turn</dd>
+<dt>Bounce</dt><dd style="margin: 0; color: #ffffff">2 cups, harder to land</dd>
+<dt>Re-rack</dt><dd style="margin: 0; color: #ffffff">at 6, 3 and 1 cups</dd>
+<dt>Re-roll</dt><dd style="margin: 0; color: #ffffff">second thrower gets a last turn</dd>
+</dl>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Time limit</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" aria-pressed="true" style="flex: 1 1 80px; min-height: 44px; background: #3f3f46; color: #ffffff; border: 1px solid #27d17f; border-radius: 4px; font-weight: 700; cursor: pointer">Off</button>
+<button type="button" aria-pressed="false" style="flex: 1 1 80px; min-height: 44px; background: transparent; color: #d4d4d8; border: 1px solid #71717a; border-radius: 4px; cursor: pointer">10 min</button>
+<button type="button" aria-pressed="false" style="flex: 1 1 80px; min-height: 44px; background: transparent; color: #d4d4d8; border: 1px solid #71717a; border-radius: 4px; cursor: pointer">15 min</button>
+</div>
+</div>
+</section>
+
+</div>
+
+<a href="match.html" style="min-height: 52px; display: flex; align-items: center; justify-content: center; background: #27d17f; color: #000000; border-radius: 4px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none">Start match</a>
+
+</div>
+</div>
+</body>
+</html>

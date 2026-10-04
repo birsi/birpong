@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Birpong stats</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Silkscreen:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+button,input{font:inherit}
+a{color:#27d17f}a:hover{color:#ffffff}
+th,td{padding:10px 12px;text-align:left;white-space:nowrap;border-top:1px solid #3f3f46}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; box-sizing: border-box; padding: 24px 24px 48px; background: linear-gradient(#000000, #323232); color: #d4d4d8; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<div style="width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 24px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 700; font-size: 24px; line-height: 1; letter-spacing: 0.04em; color: #ffffff">BIRPONG</span>
+<a href="home.html" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; text-decoration: none">Home</a>
+</header>
+
+<section style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px">
+<h1 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 700; font-size: 40px; line-height: 1; color: #ffffff">birsi</h1>
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #000000; background: #d4d4d8; padding: 2px 6px; border-radius: 3px">GUEST</span>
+</div>
+<div style="flex: 1 1 360px; min-width: 0; max-width: 560px; box-sizing: border-box; border: 1px solid #3f3f46; border-radius: 6px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<p style="margin: 0; flex: 1 1 220px; font-size: 13px">Stats live on this device. Sign in to sync them and join the leaderboard.</p>
+<button type="button" style="min-height: 44px; padding: 0 16px; background: transparent; color: #27d17f; border: 1px solid #27d17f; border-radius: 4px; cursor: pointer">Sign in</button>
+</div>
+</section>
+
+<div role="tablist" aria-label="Stats views" style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" role="tab" aria-selected="true" style="min-height: 44px; padding: 0 18px; background: #3f3f46; color: #ffffff; border: 1px solid #27d17f; border-radius: 4px; font-weight: 700; cursor: pointer">My stats</button>
+<button type="button" role="tab" aria-selected="false" style="min-height: 44px; padding: 0 18px; background: transparent; color: #d4d4d8; border: 1px solid #71717a; border-radius: 4px; cursor: pointer">Leaderboard</button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); gap: 12px">
+<div style="background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Matches</span>
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 36px; line-height: 1; color: #ffffff">42</span>
+</div>
+<div style="background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Wins</span>
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 36px; line-height: 1; color: #ffffff">27</span>
+</div>
+<div style="background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Win rate</span>
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 36px; line-height: 1; color: #ffffff">64%</span>
+</div>
+<div style="background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Hit rate</span>
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 36px; line-height: 1; color: #ffffff">38%</span>
+</div>
+<div style="background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Balls back</span>
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 36px; line-height: 1; color: #ffffff">9</span>
+</div>
+<div style="background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Best streak</span>
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 36px; line-height: 1; color: #ffffff">5</span>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+
+<section style="flex: 1 1 300px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 20px; line-height: 1.1; letter-spacing: 0.06em; color: #ffffff">WHERE YOU HIT</h2>
+<p style="margin: 0; font-size: 13px">Share of your hits per cup, in percent. Your side is on the left.</p>
+</div>
+<svg viewBox="2 10 36 40" role="img" aria-label="Share of hits per cup position. Front cup 14 percent, second row 12 and 13, third row 10, 13 and 10, back row 6, 8, 8 and 6." style="display: block; width: 100%; max-width: 260px; height: auto; align-self: center; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-weight: 700; font-size: 2.7px">
+<g stroke="#ffffff" stroke-width="0.35" fill="#27d17f">
+<circle cx="8.1" cy="30" r="4.2" fill-opacity="0.9"><title>Front cup: 14%</title></circle>
+<circle cx="16.07" cy="25.4" r="4.2" fill-opacity="0.65"><title>Second row, top: 12%</title></circle>
+<circle cx="16.07" cy="34.6" r="4.2" fill-opacity="0.75"><title>Second row, bottom: 13%</title></circle>
+<circle cx="24.03" cy="20.8" r="4.2" fill-opacity="0.4"><title>Third row, top: 10%</title></circle>
+<circle cx="24.03" cy="30" r="4.2" fill-opacity="0.75"><title>Third row, middle: 13%</title></circle>
+<circle cx="24.03" cy="39.2" r="4.2" fill-opacity="0.4"><title>Third row, bottom: 10%</title></circle>
+<circle cx="32" cy="16.2" r="4.2" fill-opacity="0.2"><title>Back row, 1 of 4: 6%</title></circle>
+<circle cx="32" cy="25.4" r="4.2" fill-opacity="0.3"><title>Back row, 2 of 4: 8%</title></circle>
+<circle cx="32" cy="34.6" r="4.2" fill-opacity="0.3"><title>Back row, 3 of 4: 8%</title></circle>
+<circle cx="32" cy="43.8" r="4.2" fill-opacity="0.2"><title>Back row, 4 of 4: 6%</title></circle>
+</g>
+<g text-anchor="middle" pointer-events="none">
+<text dy="0.35em" x="8.1" y="30" fill="#000000">14</text>
+<text dy="0.35em" x="16.07" y="25.4" fill="#000000">12</text>
+<text dy="0.35em" x="16.07" y="34.6" fill="#000000">13</text>
+<text dy="0.35em" x="24.03" y="20.8" fill="#ffffff">10</text>
+<text dy="0.35em" x="24.03" y="30" fill="#000000">13</text>
+<text dy="0.35em" x="24.03" y="39.2" fill="#ffffff">10</text>
+<text dy="0.35em" x="32" y="16.2" fill="#ffffff">6</text>
+<text dy="0.35em" x="32" y="25.4" fill="#ffffff">8</text>
+<text dy="0.35em" x="32" y="34.6" fill="#ffffff">8</text>
+<text dy="0.35em" x="32" y="43.8" fill="#ffffff">6</text>
+</g>
+</svg>
+</section>
+
+<section style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 20px; line-height: 1.1; letter-spacing: 0.06em; color: #ffffff">RECENT MATCHES</h2>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 13px">
+<thead>
+<tr style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">
+<th scope="col" style="border-top: 0; font-weight: 400">Date</th>
+<th scope="col" style="border-top: 0; font-weight: 400">Opponent</th>
+<th scope="col" style="border-top: 0; font-weight: 400">Mode</th>
+<th scope="col" style="border-top: 0; font-weight: 400">Result</th>
+<th scope="col" style="border-top: 0; font-weight: 400">Cups</th>
+<th scope="col" style="border-top: 0; font-weight: 400">Hit rate</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>04 Oct</td><td style="color: #ffffff">CPU medium</td><td>Solo</td><td style="color: #27d17f; font-weight: 700">W</td><td style="color: #ffffff">10 : 7</td><td style="color: #ffffff">38%</td></tr>
+<tr><td>03 Oct</td><td style="color: #ffffff">flo</td><td>Online</td><td style="color: #ff9900; font-weight: 700">L</td><td style="color: #ffffff">8 : 10</td><td style="color: #ffffff">31%</td></tr>
+<tr><td>03 Oct</td><td style="color: #ffffff">flo</td><td>Online</td><td style="color: #27d17f; font-weight: 700">W</td><td style="color: #ffffff">10 : 9</td><td style="color: #ffffff">42%</td></tr>
+<tr><td>01 Oct</td><td style="color: #ffffff">CPU hard</td><td>Solo</td><td style="color: #ff9900; font-weight: 700">L</td><td style="color: #ffffff">6 : 10</td><td style="color: #ffffff">29%</td></tr>
+<tr><td>30 Sep</td><td style="color: #ffffff">CPU easy</td><td>Solo</td><td style="color: #27d17f; font-weight: 700">W</td><td style="color: #ffffff">10 : 3</td><td style="color: #ffffff">47%</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+</div>
+
+</div>
+</div>
+</body>
+</html>

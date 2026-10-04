@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Birpong match, bounce selected</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Silkscreen:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+button,input{font:inherit}
+a{color:#27d17f}a:hover{color:#ffffff}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; box-sizing: border-box; padding: 24px 24px 40px; background: linear-gradient(#000000, #323232); color: #d4d4d8; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<div style="width: 100%; max-width: 1216px; display: flex; flex-direction: column; gap: 20px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 700; font-size: 24px; line-height: 1; letter-spacing: 0.04em; color: #ffffff">BIRPONG</span>
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid #71717a; border-radius: 3px; padding: 3px 8px">Solo · CPU medium</span>
+</div>
+<nav style="display: flex; flex-wrap: wrap; gap: 8px">
+<a href="https://www.beerpongaustria.com/beer-pong-austria-game-rules/" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; text-decoration: none">Rules</a>
+<a href="result.html" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; text-decoration: none">Skip to result</a>
+<a href="home.html" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; text-decoration: none">Leave match</a>
+</nav>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+
+<section aria-label="Your cups" style="flex: 1 1 280px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #000000; background: #27d17f; padding: 2px 6px; border-radius: 3px">YOU</span>
+<span style="font-size: 16px; font-weight: 500; color: #ffffff">birsi</span>
+</div>
+<div style="display: flex; gap: 5px">
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1px solid #71717a"></span>
+<span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1px solid #71717a"></span>
+</div>
+</div>
+<div style="display: flex; align-items: baseline; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 44px; line-height: 1; color: #ffffff">8</span>
+<span style="font-size: 12px">cups left</span>
+</div>
+</section>
+
+<section aria-label="Turn" style="flex: 1 1 300px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #27d17f; border-radius: 6px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 22px; line-height: 1; letter-spacing: 0.06em; color: #27d17f">YOUR TURN</span>
+<div style="display: flex; align-items: center; gap: 14px; font-size: 12px">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 50%; background: #27d17f"></span>1 hit</span>
+<span style="display: flex; align-items: center; gap: 6px; color: #ffffff"><span style="width: 12px; height: 12px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 0 2px #27272a, 0 0 0 4px #27d17f"></span>2 aiming</span>
+</div>
+</div>
+<p style="margin: 0; font-size: 13px">A bounce hit takes 2 cups and both balls come back. Miss and CPU re-racks at 6.</p>
+</section>
+
+<section aria-label="Opponent cups" style="flex: 1 1 280px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: baseline; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 44px; line-height: 1; color: #ffffff">7</span>
+<span style="font-size: 12px">cups left</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="font-size: 16px; font-weight: 500; color: #ffffff">Medium</span>
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #000000; background: #ff9900; padding: 2px 6px; border-radius: 3px">CPU</span>
+</div>
+<div style="display: flex; gap: 5px">
+<span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1px solid #71717a"></span>
+<span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1px solid #71717a"></span>
+<span style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 1px solid #71717a"></span>
+<span title="Hit this turn" style="width: 10px; height: 10px; border-radius: 50%; background: #27d17f"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: #d4d4d8"></span>
+</div>
+</div>
+</section>
+
+</div>
+
+<div style="position: relative; width: 100%; aspect-ratio: 300 / 70; background: #27272a; box-shadow: inset 0 0 0 1px #3f3f46; border-radius: 6px; overflow: hidden">
+
+<span style="position: absolute; left: 1.2%; top: 5%; font-size: 11px; letter-spacing: 0.12em; color: #d4d4d8">YOU</span>
+<span style="position: absolute; right: 1.2%; top: 5%; font-size: 11px; letter-spacing: 0.12em; color: #d4d4d8">CPU</span>
+
+<div style="position: absolute; left: 10%; top: 7.143%; width: 80%; height: 85.714%; background: #000000; box-shadow: 0 0 0 2px #d4d4d8; border-radius: 5px">
+<svg viewBox="0 0 240 60" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%">
+<line x1="60" y1="0" x2="60" y2="60" stroke="#3f3f46" stroke-width="0.4"></line>
+<line x1="120" y1="0" x2="120" y2="60" stroke="#3f3f46" stroke-width="0.4"></line>
+<line x1="180" y1="0" x2="180" y2="60" stroke="#3f3f46" stroke-width="0.4"></line>
+<circle cx="120" cy="30" r="9" fill="#000000" stroke="#71717a" stroke-width="0.4"></circle>
+<polygon points="2.2,6.15 2.2,53.85 43.5,30" fill="none" stroke="#71717a" stroke-width="0.4" stroke-linejoin="round"></polygon>
+<polygon points="237.8,6.15 237.8,53.85 196.5,30" fill="none" stroke="#71717a" stroke-width="0.4" stroke-linejoin="round"></polygon>
+</svg>
+
+<div title="Your cup" style="position: absolute; left: 3.33%; top: 27%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="Your cup" style="position: absolute; left: 3.33%; top: 42.33%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="Your cup" style="position: absolute; left: 3.33%; top: 57.67%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="Your cup" style="position: absolute; left: 3.33%; top: 73%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="Your cup" style="position: absolute; left: 6.65%; top: 34.67%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="Your cup" style="position: absolute; left: 6.65%; top: 50%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="Your cup" style="position: absolute; left: 6.65%; top: 65.33%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="Removed" style="position: absolute; left: 9.97%; top: 42.33%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; border: 1px dashed #71717a"></div>
+<div title="Your cup" style="position: absolute; left: 9.97%; top: 57.67%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="Removed" style="position: absolute; left: 13.29%; top: 50%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; border: 1px dashed #71717a"></div>
+
+<div title="Removed" style="position: absolute; left: 86.71%; top: 50%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; border: 1px dashed #71717a"></div>
+<div title="Hit this turn" style="position: absolute; left: 90.03%; top: 42.33%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27d17f; border: 3px solid #27d17f">
+<div style="position: absolute; left: 50%; top: 50%; width: 50%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: #ffffff"></div>
+</div>
+<div title="Removed" style="position: absolute; left: 90.03%; top: 57.67%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; border: 1px dashed #71717a"></div>
+<div title="Removed" style="position: absolute; left: 93.35%; top: 34.67%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; border: 1px dashed #71717a"></div>
+<div title="Target" style="position: absolute; left: 93.35%; top: 50%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="CPU cup" style="position: absolute; left: 93.35%; top: 65.33%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="CPU cup" style="position: absolute; left: 96.67%; top: 27%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="CPU cup" style="position: absolute; left: 96.67%; top: 42.33%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="CPU cup" style="position: absolute; left: 96.67%; top: 57.67%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div title="CPU cup" style="position: absolute; left: 96.67%; top: 73%; width: 3.6%; aspect-ratio: 1; transform: translate(-50%, -50%); box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+</div>
+
+<svg viewBox="0 0 300 70" role="img" aria-label="Aim line from your ball, bouncing once on the table, to a wide landing area in the CPU rack" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none">
+<line x1="30" y1="0" x2="30" y2="70" stroke="#71717a" stroke-width="0.25" stroke-dasharray="1 1.5"></line>
+<line x1="270" y1="0" x2="270" y2="70" stroke="#71717a" stroke-width="0.25" stroke-dasharray="1 1.5"></line>
+<line x1="17" y1="43" x2="254.03" y2="35" stroke="#27d17f" stroke-width="0.55" stroke-dasharray="0.01 1.8" stroke-linecap="round"></line>
+<circle cx="254.03" cy="35" r="12.5" fill="#27d17f" fill-opacity="0.14" stroke="#27d17f" stroke-width="0.45"></circle>
+<circle cx="175" cy="37.67" r="1.8" fill="#000000" stroke="#27d17f" stroke-width="0.45"></circle>
+<line x1="17" y1="43" x2="4.01" y2="43.44" stroke="#ffffff" stroke-width="0.4"></line>
+<circle cx="4.01" cy="43.44" r="1.5" fill="#27272a" stroke="#ffffff" stroke-width="0.4"></circle>
+</svg>
+
+<div title="Your ball" style="position: absolute; left: 5.667%; top: 61.43%; width: 1.5%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: #ffffff; box-shadow: 0 0 0 2px #27272a, 0 0 0 4px #27d17f"></div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+
+<section aria-label="Shot" style="flex: 1 1 420px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<a href="match.html" style="flex: 1 1 180px; min-height: 56px; box-sizing: border-box; padding: 8px 14px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; text-align: left; background: transparent; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; text-decoration: none">
+<span style="font-weight: 700; letter-spacing: 0.1em">AIR</span>
+<span style="font-size: 12px; color: #d4d4d8">1 cup, straight in</span>
+</a>
+<button type="button" aria-pressed="true" style="flex: 1 1 180px; min-height: 56px; box-sizing: border-box; padding: 8px 14px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; text-align: left; background: #3f3f46; color: #ffffff; border: 1px solid #27d17f; border-radius: 4px; cursor: pointer">
+<span style="font-weight: 700; letter-spacing: 0.1em">BOUNCE</span>
+<span style="font-size: 12px; color: #d4d4d8">2 cups, harder to land</span>
+</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Power</span>
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 18px; line-height: 1; color: #ffffff">72%</span>
+</div>
+<div role="img" aria-label="Power 72 percent, inside the bounce window of 64 to 78 percent" style="position: relative; height: 8px; margin: 5px 0">
+<div style="height: 100%; border-radius: 4px; background: #3f3f46; overflow: hidden">
+<div style="width: 72%; height: 100%; border-radius: 4px; background: #27d17f"></div>
+</div>
+<div style="position: absolute; left: 64%; top: -5px; width: 14%; height: 18px; box-sizing: border-box; border: 2px solid #ffffff; border-radius: 4px"></div>
+</div>
+<p style="margin: 0; font-size: 13px">A bounce only lands with the power inside the marked window. Too soft dies on the table, too hard clears the rack.</p>
+</div>
+</section>
+
+<section aria-label="Throw log" style="flex: 1 1 420px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 12px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase">Last throws</h2>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+<li style="display: flex; gap: 12px; color: #ffffff"><span style="flex: 0 0 28px">T7</span><span style="flex: 0 0 40px">You</span><span style="flex: 0 0 64px">air</span><span>hit, cup leaves at turn end</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: 0 0 28px">T6</span><span style="flex: 0 0 40px">CPU</span><span style="flex: 0 0 64px">bounce</span><span>miss</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: 0 0 28px">T6</span><span style="flex: 0 0 40px">CPU</span><span style="flex: 0 0 64px">air</span><span>miss</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: 0 0 28px">T5</span><span style="flex: 0 0 40px">You</span><span style="flex: 0 0 64px">air</span><span>miss</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: 0 0 28px">T5</span><span style="flex: 0 0 40px">You</span><span style="flex: 0 0 64px">air</span><span>hit</span></li>
+</ol>
+</section>
+
+</div>
+
+</div>
+</div>
+</body>
+</html>

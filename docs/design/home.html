@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Birpong home</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Silkscreen:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+button,input{font:inherit}
+a{color:#27d17f}a:hover{color:#ffffff}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; box-sizing: border-box; padding: 48px 24px 56px; background: linear-gradient(#000000, #323232); color: #d4d4d8; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<div style="width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 32px">
+
+<header style="display: flex; flex-direction: column; gap: 20px">
+<h1 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 700; font-size: clamp(44px, 9vw, 96px); line-height: 1; letter-spacing: 0.04em; color: #ffffff">BIRPONG</h1>
+<svg viewBox="0 0 240 60" role="img" aria-label="Beer pong table seen from above, ten cups at each end" style="display: block; width: 100%; height: auto">
+<rect x="0.6" y="0.6" width="238.8" height="58.8" rx="1.6" fill="#000000" stroke="#d4d4d8" stroke-width="0.6"></rect>
+<line x1="60" y1="1" x2="60" y2="59" stroke="#3f3f46" stroke-width="0.4"></line>
+<line x1="120" y1="1" x2="120" y2="59" stroke="#3f3f46" stroke-width="0.4"></line>
+<line x1="180" y1="1" x2="180" y2="59" stroke="#3f3f46" stroke-width="0.4"></line>
+<circle cx="120" cy="30" r="9" fill="#000000" stroke="#71717a" stroke-width="0.4"></circle>
+<polygon points="2.2,6.15 2.2,53.85 43.5,30" fill="none" stroke="#71717a" stroke-width="0.4" stroke-linejoin="round"></polygon>
+<polygon points="237.8,6.15 237.8,53.85 196.5,30" fill="none" stroke="#71717a" stroke-width="0.4" stroke-linejoin="round"></polygon>
+<g fill="#27272a" stroke="#ffffff" stroke-width="0.8">
+<circle cx="8" cy="16.2" r="4.1"></circle>
+<circle cx="8" cy="25.4" r="4.1"></circle>
+<circle cx="8" cy="34.6" r="4.1"></circle>
+<circle cx="8" cy="43.8" r="4.1"></circle>
+<circle cx="15.97" cy="20.8" r="4.1"></circle>
+<circle cx="15.97" cy="30" r="4.1"></circle>
+<circle cx="15.97" cy="39.2" r="4.1"></circle>
+<circle cx="23.93" cy="25.4" r="4.1"></circle>
+<circle cx="23.93" cy="34.6" r="4.1"></circle>
+<circle cx="31.9" cy="30" r="4.1"></circle>
+<circle cx="232" cy="16.2" r="4.1"></circle>
+<circle cx="232" cy="25.4" r="4.1"></circle>
+<circle cx="232" cy="34.6" r="4.1"></circle>
+<circle cx="232" cy="43.8" r="4.1"></circle>
+<circle cx="224.03" cy="20.8" r="4.1"></circle>
+<circle cx="224.03" cy="30" r="4.1"></circle>
+<circle cx="224.03" cy="39.2" r="4.1"></circle>
+<circle cx="216.07" cy="25.4" r="4.1"></circle>
+<circle cx="216.07" cy="34.6" r="4.1"></circle>
+<circle cx="208.1" cy="30" r="4.1"></circle>
+</g>
+<circle cx="120" cy="30" r="2" fill="#27d17f"></circle>
+</svg>
+<p style="margin: 0; max-width: 620px; color: #d4d4d8">Beer pong from above. Ten cups, two balls per turn, Beer Pong Austria rules.</p>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px">
+
+<section style="flex: 1 1 340px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 24px; line-height: 1; letter-spacing: 0.06em; color: #ffffff">SOLO</h2>
+<p style="margin: 0">You against the CPU. You throw both balls.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">CPU level</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" aria-pressed="false" style="flex: 1 1 80px; min-height: 44px; background: transparent; color: #d4d4d8; border: 1px solid #71717a; border-radius: 4px; cursor: pointer">Easy</button>
+<button type="button" aria-pressed="true" style="flex: 1 1 80px; min-height: 44px; background: #3f3f46; color: #ffffff; border: 1px solid #27d17f; border-radius: 4px; font-weight: 700; cursor: pointer">Medium</button>
+<button type="button" aria-pressed="false" style="flex: 1 1 80px; min-height: 44px; background: transparent; color: #d4d4d8; border: 1px solid #71717a; border-radius: 4px; cursor: pointer">Hard</button>
+</div>
+</div>
+<a href="first-throw.html" style="margin-top: auto; min-height: 48px; display: flex; align-items: center; justify-content: center; background: #27d17f; color: #000000; border-radius: 4px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none">Start match</a>
+</section>
+
+<section style="flex: 1 1 340px; min-width: 0; box-sizing: border-box; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 24px; line-height: 1; letter-spacing: 0.06em; color: #ffffff">ONLINE</h2>
+<p style="margin: 0">One on one. Share a room code, no account needed.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="room-code" style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Room code</label>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<input id="room-code" type="text" placeholder="K7QM" style="flex: 1 1 140px; min-width: 0; min-height: 44px; box-sizing: border-box; padding: 0 12px; background: #000000; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; letter-spacing: 0.3em; text-transform: uppercase">
+<a href="lobby.html" style="flex: 0 0 auto; min-height: 44px; box-sizing: border-box; padding: 0 20px; display: flex; align-items: center; justify-content: center; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none">Join</a>
+</div>
+</div>
+<a href="lobby.html" style="margin-top: auto; min-height: 48px; display: flex; align-items: center; justify-content: center; background: #27d17f; color: #000000; border-radius: 4px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none">Create room</a>
+</section>
+
+</div>
+
+<section style="box-sizing: border-box; border: 1px solid #3f3f46; border-radius: 6px; padding: 20px 24px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px">
+<div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+<label for="nickname" style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">Playing as</label>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<input id="nickname" type="text" value="birsi" placeholder="nickname" style="flex: 0 1 200px; min-width: 0; min-height: 44px; box-sizing: border-box; padding: 0 12px; background: #000000; color: #ffffff; border: 1px solid #71717a; border-radius: 4px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #000000; background: #d4d4d8; padding: 2px 6px; border-radius: 3px">GUEST</span>
+</div>
+<p style="margin: 0; font-size: 13px">Stats are saved on this device. Sign in to sync them and join the leaderboard.</p>
+</div>
+<nav style="display: flex; flex-wrap: wrap; gap: 8px">
+<a href="stats.html" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; text-decoration: none">Stats</a>
+<a href="https://www.beerpongaustria.com/beer-pong-austria-game-rules/" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; color: #ffffff; border: 1px solid #71717a; border-radius: 4px; text-decoration: none">Rules</a>
+<button type="button" style="min-height: 44px; padding: 0 16px; background: transparent; color: #27d17f; border: 1px solid #27d17f; border-radius: 4px; cursor: pointer">Sign in</button>
+</nav>
+</section>
+
+</div>
+</div>
+</body>
+</html>

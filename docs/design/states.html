@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Birpong table and turn states</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Silkscreen:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</head>
+<body>
+<div style="width: 1280px; height: 860px; box-sizing: border-box; padding: 48px 56px; background: linear-gradient(#000000, #323232); color: #d4d4d8; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.5; display: flex; flex-direction: column; gap: 32px">
+
+<section style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 20px; line-height: 1; letter-spacing: 0.06em; color: #ffffff">RACKS</h2>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px">
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<svg viewBox="0 0 60 60" role="img" aria-label="Start rack, ten cups in rows of 4, 3, 2 and 1" style="display: block; width: 100%; height: auto">
+<path d="M60,0.6 H2.2 A1.6,1.6 0 0 0 0.6,2.2 V57.8 A1.6,1.6 0 0 0 2.2,59.4 H60" fill="#000000" stroke="#d4d4d8" stroke-width="0.6"></path>
+<polygon points="2.2,6.15 2.2,53.85 43.5,30" fill="none" stroke="#71717a" stroke-width="0.4" stroke-linejoin="round"></polygon>
+<g fill="#27272a" stroke="#ffffff" stroke-width="0.8">
+<circle cx="8" cy="16.2" r="4.1"></circle>
+<circle cx="8" cy="25.4" r="4.1"></circle>
+<circle cx="8" cy="34.6" r="4.1"></circle>
+<circle cx="8" cy="43.8" r="4.1"></circle>
+<circle cx="15.97" cy="20.8" r="4.1"></circle>
+<circle cx="15.97" cy="30" r="4.1"></circle>
+<circle cx="15.97" cy="39.2" r="4.1"></circle>
+<circle cx="23.93" cy="25.4" r="4.1"></circle>
+<circle cx="23.93" cy="34.6" r="4.1"></circle>
+<circle cx="31.9" cy="30" r="4.1"></circle>
+</g>
+</svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 700; color: #ffffff">10 cups, start</span>
+<span>Pyramid 4-3-2-1 at the table end.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<svg viewBox="0 0 60 60" role="img" aria-label="Re-rack at six cups, rows of 3, 2 and 1 from the tip" style="display: block; width: 100%; height: auto">
+<path d="M60,0.6 H2.2 A1.6,1.6 0 0 0 0.6,2.2 V57.8 A1.6,1.6 0 0 0 2.2,59.4 H60" fill="#000000" stroke="#d4d4d8" stroke-width="0.6"></path>
+<polygon points="2.2,6.15 2.2,53.85 43.5,30" fill="none" stroke="#71717a" stroke-width="0.4" stroke-linejoin="round"></polygon>
+<g fill="none" stroke="#71717a" stroke-width="0.3" stroke-dasharray="1 1">
+<circle cx="8" cy="16.2" r="4.1"></circle>
+<circle cx="8" cy="25.4" r="4.1"></circle>
+<circle cx="8" cy="34.6" r="4.1"></circle>
+<circle cx="8" cy="43.8" r="4.1"></circle>
+</g>
+<g fill="#27272a" stroke="#ffffff" stroke-width="0.8">
+<circle cx="15.97" cy="20.8" r="4.1"></circle>
+<circle cx="15.97" cy="30" r="4.1"></circle>
+<circle cx="15.97" cy="39.2" r="4.1"></circle>
+<circle cx="23.93" cy="25.4" r="4.1"></circle>
+<circle cx="23.93" cy="34.6" r="4.1"></circle>
+<circle cx="31.9" cy="30" r="4.1"></circle>
+</g>
+</svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 700; color: #ffffff">6 cups, re-rack</span>
+<span>3-2-1, rebuilt from the tip.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<svg viewBox="0 0 60 60" role="img" aria-label="Re-rack at three cups, rows of 2 and 1 from the tip" style="display: block; width: 100%; height: auto">
+<path d="M60,0.6 H2.2 A1.6,1.6 0 0 0 0.6,2.2 V57.8 A1.6,1.6 0 0 0 2.2,59.4 H60" fill="#000000" stroke="#d4d4d8" stroke-width="0.6"></path>
+<polygon points="2.2,6.15 2.2,53.85 43.5,30" fill="none" stroke="#71717a" stroke-width="0.4" stroke-linejoin="round"></polygon>
+<g fill="none" stroke="#71717a" stroke-width="0.3" stroke-dasharray="1 1">
+<circle cx="8" cy="16.2" r="4.1"></circle>
+<circle cx="8" cy="25.4" r="4.1"></circle>
+<circle cx="8" cy="34.6" r="4.1"></circle>
+<circle cx="8" cy="43.8" r="4.1"></circle>
+<circle cx="15.97" cy="20.8" r="4.1"></circle>
+<circle cx="15.97" cy="30" r="4.1"></circle>
+<circle cx="15.97" cy="39.2" r="4.1"></circle>
+</g>
+<g fill="#27272a" stroke="#ffffff" stroke-width="0.8">
+<circle cx="23.93" cy="25.4" r="4.1"></circle>
+<circle cx="23.93" cy="34.6" r="4.1"></circle>
+<circle cx="31.9" cy="30" r="4.1"></circle>
+</g>
+</svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 700; color: #ffffff">3 cups, re-rack</span>
+<span>2-1, rebuilt from the tip.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<svg viewBox="0 0 60 60" role="img" aria-label="Re-rack at one cup, single cup at the tip" style="display: block; width: 100%; height: auto">
+<path d="M60,0.6 H2.2 A1.6,1.6 0 0 0 0.6,2.2 V57.8 A1.6,1.6 0 0 0 2.2,59.4 H60" fill="#000000" stroke="#d4d4d8" stroke-width="0.6"></path>
+<polygon points="2.2,6.15 2.2,53.85 43.5,30" fill="none" stroke="#71717a" stroke-width="0.4" stroke-linejoin="round"></polygon>
+<g fill="none" stroke="#71717a" stroke-width="0.3" stroke-dasharray="1 1">
+<circle cx="8" cy="16.2" r="4.1"></circle>
+<circle cx="8" cy="25.4" r="4.1"></circle>
+<circle cx="8" cy="34.6" r="4.1"></circle>
+<circle cx="8" cy="43.8" r="4.1"></circle>
+<circle cx="15.97" cy="20.8" r="4.1"></circle>
+<circle cx="15.97" cy="30" r="4.1"></circle>
+<circle cx="15.97" cy="39.2" r="4.1"></circle>
+<circle cx="23.93" cy="25.4" r="4.1"></circle>
+<circle cx="23.93" cy="34.6" r="4.1"></circle>
+</g>
+<circle cx="31.9" cy="30" r="4.1" fill="#27272a" stroke="#ffffff" stroke-width="0.8"></circle>
+</svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 700; color: #ffffff">1 cup, re-rack</span>
+<span>Last cup moves to the tip.</span>
+</div>
+</div>
+
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 20px; line-height: 1; letter-spacing: 0.06em; color: #ffffff">CUPS AND BALL</h2>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px">
+
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="flex: 0 0 auto; width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff"></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 700; color: #ffffff">Standing</span><span>In play.</span></div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="flex: 0 0 auto; width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; background: #27272a; border: 3px solid #ffffff; box-shadow: 0 0 0 4px #000000, 0 0 0 6px #27d17f"></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 700; color: #ffffff">Target</span><span>Aim line ends here.</span></div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="flex: 0 0 auto; position: relative; width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; background: #27d17f; border: 3px solid #27d17f">
+<div style="position: absolute; left: 50%; top: 50%; width: 50%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: #ffffff"></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 700; color: #ffffff">Hit</span><span>Leaves at turn end.</span></div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="flex: 0 0 auto; width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; border: 1px dashed #71717a"></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 700; color: #ffffff">Removed</span><span>Empty rack slot.</span></div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="flex: 0 0 auto; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
+<div style="width: 18px; height: 18px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 0 2px #000000, 0 0 0 4px #27d17f"></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 700; color: #ffffff">Ball</span><span>Green ring: yours to throw.</span></div>
+</div>
+
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-weight: 400; font-size: 20px; line-height: 1; letter-spacing: 0.06em; color: #ffffff">TURN BANNERS</h2>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; row-gap: 20px">
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 16px; line-height: 1; letter-spacing: 0.06em; color: #000000; background: #27d17f; border: 1px solid #27d17f; border-radius: 4px; padding: 9px 12px">YOUR TURN</span>
+<span>You hold both balls.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 16px; line-height: 1; letter-spacing: 0.06em; color: #000000; background: #ff9900; border: 1px solid #ff9900; border-radius: 4px; padding: 9px 12px">THEIR TURN</span>
+<span>Opponent throws both balls.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 16px; line-height: 1; letter-spacing: 0.06em; color: #27d17f; border: 1px solid #27d17f; border-radius: 4px; padding: 9px 12px">BALLS BACK</span>
+<span>Both balls hit. Throw again, once per turn.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 16px; line-height: 1; letter-spacing: 0.06em; color: #ffffff; border: 1px solid #d4d4d8; border-radius: 4px; padding: 9px 12px">RE-RACK</span>
+<span>6, 3 or 1 cups left after a turn.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 16px; line-height: 1; letter-spacing: 0.06em; color: #27d17f; border: 1px solid #27d17f; border-radius: 4px; padding: 9px 12px">BOUNCE, 2 CUPS</span>
+<span>Bounce shot lands. Thrower picks the second cup.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 16px; line-height: 1; letter-spacing: 0.06em; color: #ffffff; border: 1px solid #d4d4d8; border-radius: 4px; padding: 9px 12px">RE-ROLL</span>
+<span>First thrower clears the rack. The other side gets a last turn.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-family: 'Silkscreen', 'JetBrains Mono', monospace; font-size: 16px; line-height: 1; letter-spacing: 0.06em; color: #ff9900; border: 1px solid #ff9900; border-radius: 4px; padding: 9px 12px">FOUL, CUP LOST</span>
+<span>Ball or table touched out of turn, or own cup knocked over.</span>
+</div>
+
+</div>
+</section>
+
+</div>
+</body>
+</html>
