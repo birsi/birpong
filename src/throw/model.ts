@@ -20,6 +20,12 @@ export const RIM_IN_OUTER = 0.2;
 /** How far a ball that bounces off the rim travels, in cm. */
 export const DEFLECT_MIN = 6;
 export const DEFLECT_MAX = 14;
+/** Chance that a ball bouncing off the rim kicks into a neighbouring cup instead of away. */
+export const RICOCHET_CHANCE = 0.12;
+/** Only cups this close to the rim cup (cm, centre to centre) can be reached; the rack spacing is 9.2. */
+export const RICOCHET_REACH = 13;
+/** The neighbour must lie within this angle (rad) of the kick direction. */
+export const RICOCHET_ARC = 0.7;
 export const BOUNCE_WINDOW: readonly [number, number] = [0.64, 0.78];
 /** Landing ring radius shown to the player; scatter sigma is half of it. */
 export const RING_RADIUS: Record<Shot, number> = { air: 6, bounce: 12.5 };
@@ -88,17 +94,17 @@ export function findCup(defender: Side, cups: readonly Cup[], landing: Point): n
   return best;
 }
 
-export type Contact = "none" | "clean" | "rattle-in" | "bounce-out";
+export type Contact = "none" | "clean" | "rattle-in" | "bounce-out" | "ricochet";
 
 export interface ThrowResult {
   landing: Point;
   /** Cup id hit, or null for a miss. */
   target: number | null;
-  /** What the ball did at the nearest cup: dropped in, rattled in off the rim, or bounced out. */
+  /** What the ball did at the nearest cup: dropped in, rattled in, bounced out, or bounced into a neighbouring cup. */
   contact: Contact;
   /** Cup id the ball touched (also set for a bounce-out, where target is null). */
   touched: number | null;
-  /** Where a ball that bounced off the rim ends up. */
+  /** Where a ball that bounced off the rim ends up (the neighbouring cup's centre for a ricochet). */
   deflect: Point | null;
 }
 
@@ -109,6 +115,31 @@ function nearestCup(defender: Side, cups: readonly Cup[], landing: Point): { id:
     const center = slotPosition(defender, cup.slot);
     const dist = Math.hypot(center.x - landing.x, center.y - landing.y);
     if (dist <= CUP_RADIUS && (!best || dist < best.dist)) best = { id: cup.id, dist, center };
+  }
+  return best;
+}
+
+/** The standing cup nearest the kick direction, within reach of the cup that was clipped. */
+function ricochetCup(
+  defender: Side,
+  cups: readonly Cup[],
+  from: { id: number; center: Point },
+  direction: number,
+): { id: number; center: Point } | null {
+  let best: { id: number; center: Point } | null = null;
+  let bestDiff = RICOCHET_ARC;
+  for (const cup of cups) {
+    if (cup.id === from.id) continue;
+    const center = slotPosition(defender, cup.slot);
+    const dx = center.x - from.center.x;
+    const dy = center.y - from.center.y;
+    if (Math.hypot(dx, dy) > RICOCHET_REACH) continue;
+    let diff = Math.abs(Math.atan2(dy, dx) - direction);
+    if (diff > Math.PI) diff = 2 * Math.PI - diff;
+    if (diff < bestDiff) {
+      best = { id: cup.id, center };
+      bestDiff = diff;
+    }
   }
   return best;
 }
@@ -142,6 +173,10 @@ export function resolveThrow(
 
   // Away from the cup centre, with a little sideways jitter.
   const away = Math.atan2(landing.y - cup.center.y, landing.x - cup.center.x) + (rng() - 0.5) * 0.8;
+  const neighbour = ricochetCup(defender, cups, cup, away);
+  if (neighbour && rng() < RICOCHET_CHANCE) {
+    return { landing, target: neighbour.id, contact: "ricochet", touched: cup.id, deflect: neighbour.center };
+  }
   const travel = DEFLECT_MIN + rng() * (DEFLECT_MAX - DEFLECT_MIN);
   const deflect = { x: landing.x + Math.cos(away) * travel, y: landing.y + Math.sin(away) * travel };
   return { landing, target: null, contact: "bounce-out", touched: cup.id, deflect };

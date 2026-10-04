@@ -204,6 +204,13 @@ export class TableScene extends Phaser.Scene {
       this.wobble(cup.body, 1.12);
       await hop(landing, result.deflect, 380, 1.7, "Quad.easeOut");
       await tween({ targets: ball, alpha: 0, duration: 200 });
+    } else if (result.contact === "ricochet" && result.deflect && cup) {
+      // Clips the rim and kicks into the cup next to it.
+      this.wobble(cup.body, 1.12);
+      const to = this.cups.get(`${defender}:${result.target}`);
+      const dest = to ? { x: to.body.x, y: to.body.y } : toPx(result.deflect);
+      await hop(landing, result.deflect, 300, 1.5, "Quad.easeOut");
+      await tween({ targets: ball, x: dest.x, y: dest.y, scale: 0.4, alpha: 0.2, duration: 200, ease: "Quad.easeIn" });
     } else {
       await tween({ targets: ball, alpha: 0, duration: 200 });
     }

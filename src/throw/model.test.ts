@@ -114,7 +114,7 @@ describe("cup rim", () => {
     for (let seed = 1; seed <= 400; seed++) {
       const r = landAt(0, seed);
       seen.add(r.contact);
-      if (r.contact === "clean" || r.contact === "rattle-in") expect(r.target).not.toBeNull();
+      if (r.contact === "clean" || r.contact === "rattle-in" || r.contact === "ricochet") expect(r.target).not.toBeNull();
       if (r.contact === "bounce-out") {
         expect(r.target).toBeNull();
         expect(r.touched).not.toBeNull();
@@ -122,7 +122,23 @@ describe("cup rim", () => {
       }
       if (r.contact === "none") expect(r.touched).toBeNull();
     }
-    expect(seen).toEqual(new Set(["clean", "rattle-in", "bounce-out", "none"]));
+    for (const c of ["clean", "rattle-in", "bounce-out", "none"]) expect(seen.has(c)).toBe(true);
+  });
+
+  it("sometimes ricochets into a different, neighbouring cup, rarely", () => {
+    let ricochets = 0;
+    let bounces = 0;
+    for (let seed = 1; seed <= 6000; seed++) {
+      const r = landAt(0, seed);
+      if (r.contact === "bounce-out") bounces++;
+      if (r.contact !== "ricochet") continue;
+      ricochets++;
+      expect(r.target).not.toBeNull();
+      expect(r.target).not.toBe(r.touched);
+      expect(r.deflect).not.toBeNull();
+    }
+    expect(ricochets).toBeGreaterThan(0);
+    expect(ricochets).toBeLessThan(bounces);
   });
 
   it("rim landings drop in less often than centre landings", () => {

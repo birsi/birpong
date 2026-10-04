@@ -257,6 +257,7 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
 
   function rimNote(contact: Contact): string {
     if (contact === "rattle-in") return "Rattled in off the rim!";
+    if (contact === "ricochet") return "Off the rim and into the next cup!";
     if (contact === "bounce-out") return "Off the rim, bounced out.";
     return "";
   }
