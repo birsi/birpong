@@ -4,6 +4,7 @@ import type { Cup, Shot, Side, State } from "../engine/types";
 import {
   BALL_START,
   CUP_RADIUS,
+  type ThrowResult,
   MIN_POWER,
   RING_RADIUS,
   aimFromPull,
@@ -163,19 +164,24 @@ export class TableScene extends Phaser.Scene {
     this.drawAim();
   }
 
-  /** Animate one throw from the thrower's ball to the landing point; resolves when it has landed. */
-  async playFlight(side: Side, landing: Point, shot: Shot): Promise<void> {
+  /** Animate one throw from the thrower's ball to where it lands and what it does at the cup. */
+  async playFlight(side: Side, result: ThrowResult, shot: Shot): Promise<void> {
     const origin = BALL_START[side];
+    const defender: Side = side === 0 ? 1 : 0;
+    const { landing } = result;
     this.balls[side].ring.setVisible(false);
-    const ball = this.flightBall.setVisible(true);
-    const hop = (from: Point, to: Point, duration: number, peak: number) =>
+    const ball = this.flightBall.setVisible(true).setAlpha(1).setScale(1);
+    const hop = (from: Point, to: Point, duration: number, peak: number, ease = "Linear") =>
       new Promise<void>((resolve) => {
         const a = toPx(from);
         const b = toPx(to);
         ball.setPosition(a.x, a.y);
         this.tweens.add({ targets: ball, scale: peak, duration: duration / 2, yoyo: true, ease: "Sine.easeOut" });
-        this.tweens.add({ targets: ball, x: b.x, y: b.y, duration, ease: "Linear", onComplete: () => resolve() });
+        this.tweens.add({ targets: ball, x: b.x, y: b.y, duration, ease, onComplete: () => resolve() });
       });
+    const tween = (config: Phaser.Types.Tweens.TweenBuilderConfig) =>
+      new Promise<void>((resolve) => this.tweens.add({ ...config, onComplete: () => resolve() }));
+
     if (shot === "air") {
       await hop(origin, landing, 650, 1.5);
     } else {
@@ -183,7 +189,53 @@ export class TableScene extends Phaser.Scene {
       await hop(origin, mid, 430, 1.4);
       await hop(mid, landing, 220, 1.25);
     }
-    ball.setVisible(false).setScale(1);
+
+    const cup = result.touched !== null ? this.cups.get(`${defender}:${result.touched}`) : undefined;
+    const cupPos = cup ? { x: cup.body.x, y: cup.body.y } : null;
+
+    if (result.contact === "clean" && cupPos) {
+      // Straight in: drop into the cup.
+      await tween({ targets: ball, x: cupPos.x, y: cupPos.y, scale: 0.4, alpha: 0.2, duration: 220, ease: "Quad.easeIn" });
+    } else if (result.contact === "rattle-in" && cupPos) {
+      // Clips the rim, circles it, then drops in.
+      await this.rattle(ball, cup!.body, cupPos, toPx(landing));
+    } else if (result.contact === "bounce-out" && result.deflect && cup && cupPos) {
+      // Hits the rim and kicks away.
+      this.wobble(cup.body, 1.12);
+      await hop(landing, result.deflect, 380, 1.7, "Quad.easeOut");
+      await tween({ targets: ball, alpha: 0, duration: 200 });
+    } else {
+      await tween({ targets: ball, alpha: 0, duration: 200 });
+    }
+    ball.setVisible(false).setAlpha(1).setScale(1);
+  }
+
+  private wobble(cup: Phaser.GameObjects.Arc, peak: number): void {
+    this.tweens.add({ targets: cup, scale: peak, duration: 70, yoyo: true, repeat: 1, ease: "Sine.easeOut" });
+  }
+
+  /** Orbit the rim with a shrinking radius, then drop in. */
+  private rattle(ball: Phaser.GameObjects.Arc, cupBody: Phaser.GameObjects.Arc, center: Point, from: Point): Promise<void> {
+    const start = Math.atan2(from.y - center.y, from.x - center.x);
+    const r0 = Math.max(Math.hypot(from.x - center.x, from.y - center.y), 2 * U);
+    const state = { t: 0 };
+    this.wobble(cupBody, 1.1);
+    return new Promise<void>((resolve) => {
+      this.tweens.add({
+        targets: state,
+        t: 1,
+        duration: 750,
+        ease: "Sine.easeOut",
+        onUpdate: () => {
+          const angle = start + state.t * Math.PI * 3.5;
+          const radius = r0 * (1 - state.t * 0.85);
+          ball.setPosition(center.x + Math.cos(angle) * radius, center.y + Math.sin(angle) * radius);
+        },
+        onComplete: () => {
+          this.tweens.add({ targets: ball, x: center.x, y: center.y, scale: 0.4, alpha: 0.2, duration: 160, ease: "Quad.easeIn", onComplete: () => resolve() });
+        },
+      });
+    });
   }
 
   // --- drawing -----------------------------------------------------------

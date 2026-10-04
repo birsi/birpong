@@ -93,3 +93,45 @@ describe("resolveThrow", () => {
     }
   });
 });
+
+describe("cup rim", () => {
+  const cups = makeRack(10);
+  const tip = { x: 240 - 31.9, y: 30 };
+  // Aim at the tip cup; scatter decides whether the ball lands in the core, on the rim or away.
+  const landAt = (offset: number, seed: number) => {
+    const dx = tip.x + offset - origin.x;
+    const dy = tip.y - origin.y;
+    const len = Math.hypot(dx, dy);
+    const aim = aimFromPull(origin, {
+      x: origin.x - (dx / len) * MAX_PULL * (len / MAX_RANGE),
+      y: origin.y - (dy / len) * MAX_PULL * (len / MAX_RANGE),
+    })!;
+    return resolveThrow(origin, aim, "air", 1, cups, mulberry32(seed));
+  };
+
+  it("reports a clean, rattle-in or bounce-out contact consistently with the target", () => {
+    const seen = new Set<string>();
+    for (let seed = 1; seed <= 400; seed++) {
+      const r = landAt(0, seed);
+      seen.add(r.contact);
+      if (r.contact === "clean" || r.contact === "rattle-in") expect(r.target).not.toBeNull();
+      if (r.contact === "bounce-out") {
+        expect(r.target).toBeNull();
+        expect(r.touched).not.toBeNull();
+        expect(r.deflect).not.toBeNull();
+      }
+      if (r.contact === "none") expect(r.touched).toBeNull();
+    }
+    expect(seen).toEqual(new Set(["clean", "rattle-in", "bounce-out", "none"]));
+  });
+
+  it("rim landings drop in less often than centre landings", () => {
+    const rate = (contacts: string[]) => contacts.filter((c) => c === "rattle-in" || c === "clean").length / contacts.length;
+    const all: string[] = [];
+    for (let seed = 1; seed <= 2000; seed++) all.push(landAt(0, seed).contact);
+    const touched = all.filter((c) => c !== "none");
+    // Fewer than all touches are hits, because some bounce out.
+    expect(rate(touched)).toBeLessThan(1);
+    expect(rate(touched)).toBeGreaterThan(0.5);
+  });
+});

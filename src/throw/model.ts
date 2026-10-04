@@ -12,6 +12,14 @@ export const MAX_RANGE = 330;
 export const MAX_PULL = 18;
 export const MIN_POWER = 0.05;
 export const CUP_RADIUS = 4.3;
+/** A landing within this distance of a cup centre drops in cleanly. Between it and CUP_RADIUS is the rim. */
+export const CUP_CORE = 2.6;
+/** Chance a rim landing rattles in: this at the edge of the core, falling to RIM_IN_EDGE at the outer rim. */
+export const RIM_IN_INNER = 0.75;
+export const RIM_IN_OUTER = 0.2;
+/** How far a ball that bounces off the rim travels, in cm. */
+export const DEFLECT_MIN = 6;
+export const DEFLECT_MAX = 14;
 export const BOUNCE_WINDOW: readonly [number, number] = [0.64, 0.78];
 /** Landing ring radius shown to the player; scatter sigma is half of it. */
 export const RING_RADIUS: Record<Shot, number> = { air: 6, bounce: 12.5 };
@@ -65,7 +73,7 @@ export function inBounceWindow(power: number): boolean {
   return power >= BOUNCE_WINDOW[0] && power <= BOUNCE_WINDOW[1];
 }
 
-/** Nearest standing cup of `defender` whose rim contains the landing point, or null. */
+/** Nearest standing cup whose opening contains the landing point, or null (used for the aim preview). */
 export function findCup(defender: Side, cups: readonly Cup[], landing: Point): number | null {
   let best: number | null = null;
   let bestDist = CUP_RADIUS;
@@ -80,10 +88,29 @@ export function findCup(defender: Side, cups: readonly Cup[], landing: Point): n
   return best;
 }
 
+export type Contact = "none" | "clean" | "rattle-in" | "bounce-out";
+
 export interface ThrowResult {
   landing: Point;
   /** Cup id hit, or null for a miss. */
   target: number | null;
+  /** What the ball did at the nearest cup: dropped in, rattled in off the rim, or bounced out. */
+  contact: Contact;
+  /** Cup id the ball touched (also set for a bounce-out, where target is null). */
+  touched: number | null;
+  /** Where a ball that bounced off the rim ends up. */
+  deflect: Point | null;
+}
+
+/** Nearest cup whose rim the landing point touches, with its distance. */
+function nearestCup(defender: Side, cups: readonly Cup[], landing: Point): { id: number; dist: number; center: Point } | null {
+  let best: { id: number; dist: number; center: Point } | null = null;
+  for (const cup of cups) {
+    const center = slotPosition(defender, cup.slot);
+    const dist = Math.hypot(center.x - landing.x, center.y - landing.y);
+    if (dist <= CUP_RADIUS && (!best || dist < best.dist)) best = { id: cup.id, dist, center };
+  }
+  return best;
 }
 
 export function resolveThrow(
@@ -100,7 +127,22 @@ export function resolveThrow(
     x: nominal.x + gaussian(rng) * sigma,
     y: nominal.y + gaussian(rng) * sigma,
   };
+  const miss: ThrowResult = { landing, target: null, contact: "none", touched: null, deflect: null };
   // A bounce outside the power window dies on the table or clears the rack.
-  if (shot === "bounce" && !inBounceWindow(aim.power)) return { landing, target: null };
-  return { landing, target: findCup(defender, cups, landing) };
+  if (shot === "bounce" && !inBounceWindow(aim.power)) return miss;
+
+  const cup = nearestCup(defender, cups, landing);
+  if (!cup) return miss;
+  if (cup.dist <= CUP_CORE) return { landing, target: cup.id, contact: "clean", touched: cup.id, deflect: null };
+
+  // Rim: the closer to the edge, the likelier the ball bounces out.
+  const edge = (cup.dist - CUP_CORE) / (CUP_RADIUS - CUP_CORE);
+  const chanceIn = RIM_IN_INNER + (RIM_IN_OUTER - RIM_IN_INNER) * edge;
+  if (rng() < chanceIn) return { landing, target: cup.id, contact: "rattle-in", touched: cup.id, deflect: null };
+
+  // Away from the cup centre, with a little sideways jitter.
+  const away = Math.atan2(landing.y - cup.center.y, landing.x - cup.center.x) + (rng() - 0.5) * 0.8;
+  const travel = DEFLECT_MIN + rng() * (DEFLECT_MAX - DEFLECT_MIN);
+  const deflect = { x: landing.x + Math.cos(away) * travel, y: landing.y + Math.sin(away) * travel };
+  return { landing, target: null, contact: "bounce-out", touched: cup.id, deflect };
 }

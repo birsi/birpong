@@ -3,7 +3,7 @@ import { TableScene, SCENE_H, SCENE_W, U } from "../game/TableScene";
 import { initialState, reduce } from "../engine/reduce";
 import { CUPS_PER_SIDE } from "../engine/rack";
 import type { Rps, Shot, Side, State } from "../engine/types";
-import { BOUNCE_WINDOW, resolveThrow, BALL_START, type Aim } from "../throw/model";
+import { BOUNCE_WINDOW, resolveThrow, BALL_START, type Aim, type Contact } from "../throw/model";
 import { mulberry32, type Rng } from "../throw/rng";
 
 const NAMES: [string, string] = ["Player 1", "Player 2"];
@@ -247,12 +247,18 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
     const result = resolveThrow(BALL_START[side], aim, thrown, defender, state.cups[defender], rng);
     flying = true;
     pushView();
-    await scene.playFlight(side, result.landing, thrown);
+    await scene.playFlight(side, result, thrown);
     flying = false;
     const before = state;
     state = reduce(state, { type: "throw", shot: thrown, target: result.target });
-    note = describe(before, state);
+    note = [rimNote(result.contact), describe(before, state)].filter(Boolean).join(" ");
     render();
+  }
+
+  function rimNote(contact: Contact): string {
+    if (contact === "rattle-in") return "Rattled in off the rim!";
+    if (contact === "bounce-out") return "Off the rim, bounced out.";
+    return "";
   }
 
   function describe(before: State, after: State): string {
