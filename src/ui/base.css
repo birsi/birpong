@@ -1,17 +1,11 @@
 body {
   margin: 0;
   min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(var(--color-ground-top), var(--color-ground-bottom));
+  background: linear-gradient(var(--color-ground-top), var(--color-ground-bottom)) fixed;
   color: var(--color-text);
-  font-family: "JetBrains Mono", monospace;
-  text-align: center;
+  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 
-h1 {
-  margin: 0 0 0.5rem;
-  color: var(--color-accent);
-  font-family: "Silkscreen", monospace;
-  font-size: 3rem;
+button {
+  font: inherit;
 }

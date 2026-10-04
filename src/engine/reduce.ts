@@ -10,6 +10,7 @@ export function initialState(): State {
     cups: [makeRack(CUPS_PER_SIDE), makeRack(CUPS_PER_SIDE)],
     first: null,
     thrower: 0,
+    turn: 1,
     ballsThrown: 0,
     hitsInRound: 0,
     ballsBackUsed: false,
@@ -68,7 +69,7 @@ function reduceThrow(state: State, shot: "air" | "bounce", target: number | null
     hitsInRound: state.hitsInRound + (hit ? 1 : 0),
     log: [
       ...state.log,
-      { side: state.thrower, shot, slot, hit, marked: newlyMarked.length },
+      { turn: state.turn, side: state.thrower, shot, slot, hit, marked: newlyMarked.length },
     ],
   };
   if (next.ballsThrown < 2) return next;
@@ -95,7 +96,7 @@ function endTurn(state: State): State {
     hitsInRound: 0,
     ballsBackUsed: false,
   };
-  const swap = { ...base, thrower: defender };
+  const swap = { ...base, thrower: defender, turn: state.turn + 1 };
 
   if (state.suddenDeath) return endSuddenDeathTurn(base, swap);
 
