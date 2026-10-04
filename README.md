@@ -36,6 +36,10 @@ npm run typecheck
 
 `npm run dev` and `npm run build` are wired up but there is no app to show yet.
 
+## Stack
+
+TypeScript, Vite, Vitest. The table scene runs on [Phaser 4](https://phaser.io); the rules engine and throw model are plain TypeScript with no Phaser dependency.
+
 ## Project layout
 
 ```
@@ -44,6 +48,9 @@ docs/
   design/          static HTML screens, PNG renders, colour tokens
 src/
   engine/          pure rules state machine and tests
+  throw/           aim, scatter and hit model, seeded RNG
+  game/            Phaser table scene (drawing, drag, animation)
+  ui/              match screen, styles
 ```
 
 The engine is a pure, deterministic state machine that knows nothing about rendering or networking. Solo, online and stats will all run on it.

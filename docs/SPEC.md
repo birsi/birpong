@@ -146,8 +146,7 @@ Rules:
 
 Technical:
 
-- Stack and framework.
-- Rendering: canvas or SVG/DOM.
+- Decided: TypeScript + Vite, Vitest. The table scene is rendered with Phaser 4 (Canvas/WebGL via AUTO, no physics modules; throws resolve through the seeded scatter model).
 - Throw model: how drag direction and length map to a landing point and scatter, and how CPU levels differ.
 - Realtime transport and hosting for rooms.
 - Account provider and where server-side stats live.

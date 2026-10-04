@@ -1,24 +1,12 @@
+import Phaser from "phaser";
+import { TableScene, SCENE_H, SCENE_W, U } from "../game/TableScene";
 import { initialState, reduce } from "../engine/reduce";
 import { CUPS_PER_SIDE } from "../engine/rack";
 import type { Rps, Shot, Side, State } from "../engine/types";
-import { draw, fromScene, SCENE_H, SCENE_W, type AimView, type SceneView } from "../render/scene";
-import {
-  BALL_START,
-  BOUNCE_WINDOW,
-  MIN_POWER,
-  aimFromPull,
-  findCup,
-  nominalLanding,
-  resolveThrow,
-  touchdown,
-  type Aim,
-  type Point,
-} from "../throw/model";
+import { BOUNCE_WINDOW, resolveThrow, BALL_START, type Aim } from "../throw/model";
 import { mulberry32, type Rng } from "../throw/rng";
 
 const NAMES: [string, string] = ["Player 1", "Player 2"];
-const GRAB_RADIUS = 16; // cm around the ball where a drag may start
-const FLIGHT_MS = 650;
 const RPS: Rps[] = ["rock", "paper", "scissors"];
 
 const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) => {
@@ -32,8 +20,8 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
   const rng: Rng = mulberry32(seed);
   let state = newGame();
   let shot: Shot = "air";
-  let drag: { aim: Aim } | null = null;
-  let flight: { pos: Point; scale: number } | null = null;
+  let dragPower = 0;
+  let flying = false;
   let note = "";
 
   function newGame(): State {
@@ -69,10 +57,8 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
   cards.append(cardA, cardTurn, cardB);
 
   const arena = el("div", "arena");
-  const canvas = el("canvas");
-  canvas.setAttribute("role", "img");
-  canvas.ariaLabel = "Beer pong table seen from above. Drag back from the glowing ball to throw.";
-  arena.append(canvas);
+  arena.setAttribute("role", "img");
+  arena.ariaLabel = "Beer pong table seen from above. Drag back from the glowing ball to throw.";
 
   const lower = el("div", "row");
   const panel = el("section", "card card--panel");
@@ -111,48 +97,30 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
     return b;
   }
 
-  // --- Rendering -------------------------------------------------------
-  const ctx = canvas.getContext("2d")!;
+  // --- Table scene (Phaser) -----------------------------------------------
+  const scene = new TableScene({
+    onAim(aim) {
+      dragPower = aim ? aim.power : 0;
+      panelUpdate();
+    },
+    onThrow(aim) {
+      note = "";
+      launch(aim);
+    },
+  });
+  new Phaser.Game({
+    type: Phaser.AUTO,
+    parent: arena,
+    width: SCENE_W * U,
+    height: SCENE_H * U,
+    banner: false,
+    disableContextMenu: true,
+    scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+    scene,
+  });
 
-  function paintCanvas() {
-    const w = arena.clientWidth;
-    const h = (w * SCENE_H) / SCENE_W;
-    const dpr = window.devicePixelRatio || 1;
-    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    draw(ctx, w, view());
-  }
-
-  function view(): SceneView {
-    let aim: AimView | null = null;
-    if (drag && state.phase !== "over") {
-      const side = state.thrower;
-      const ball = BALL_START[side];
-      const defender = other(side);
-      const landing = nominalLanding(ball, drag.aim);
-      aim = {
-        side,
-        ball,
-        handle: drag.aim.handle,
-        landing,
-        shot,
-        touchdown: touchdown(ball, landing),
-        targetCup: findCup(defender, state.cups[defender], landing),
-      };
-    }
-    return {
-      state,
-      balls: [
-        { side: 0, pos: BALL_START[0] },
-        { side: 1, pos: BALL_START[1] },
-      ],
-      aim,
-      flight,
-      labels: NAMES,
-    };
+  function pushView() {
+    scene.setView({ state, shot, canThrow: !flying && state.phase !== "over", labels: NAMES });
   }
 
   function dots(side: Side): HTMLElement {
@@ -234,7 +202,7 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
     airBtn.ariaPressed = String(shot === "air");
     bounceBtn.ariaPressed = String(shot === "bounce");
     windowEl.style.display = shot === "bounce" ? "block" : "none";
-    const p = drag ? drag.aim.power : 0;
+    const p = dragPower;
     fill.style.width = `${p * 100}%`;
     powerValue.textContent = `${Math.round(p * 100)}%`;
     barEl.setAttribute("role", "img");
@@ -251,56 +219,10 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
     turnCard();
     logCardUpdate();
     panelUpdate();
-    paintCanvas();
+    pushView();
   }
 
-  // --- Input -----------------------------------------------------------
   const other = (s: Side): Side => (s === 0 ? 1 : 0);
-
-  function pointerCm(e: PointerEvent): Point {
-    const r = canvas.getBoundingClientRect();
-    return fromScene({
-      x: ((e.clientX - r.left) / r.width) * SCENE_W,
-      y: ((e.clientY - r.top) / r.height) * SCENE_H,
-    });
-  }
-
-  canvas.addEventListener("pointerdown", (e) => {
-    if (flight || state.phase === "over") return;
-    const p = pointerCm(e);
-    const ball = BALL_START[state.thrower];
-    if (Math.hypot(p.x - ball.x, p.y - ball.y) > GRAB_RADIUS) return;
-    canvas.setPointerCapture(e.pointerId);
-    drag = { aim: aimFromPull(ball, p) ?? emptyAim(ball) };
-    note = "";
-    render();
-  });
-
-  canvas.addEventListener("pointermove", (e) => {
-    if (!drag) return;
-    const ball = BALL_START[state.thrower];
-    drag = { aim: aimFromPull(ball, pointerCm(e)) ?? emptyAim(ball) };
-    panelUpdate();
-    paintCanvas();
-  });
-
-  const finish = (e: PointerEvent, cancel: boolean) => {
-    if (!drag) return;
-    const aim = drag.aim;
-    drag = null;
-    if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
-    if (cancel || aim.power < MIN_POWER) {
-      render();
-      return;
-    }
-    launch(aim);
-  };
-  canvas.addEventListener("pointerup", (e) => finish(e, false));
-  canvas.addEventListener("pointercancel", (e) => finish(e, true));
-
-  function emptyAim(ball: Point): Aim {
-    return { dir: { x: ball.x < 120 ? 1 : -1, y: 0 }, power: 0, handle: ball };
-  }
 
   airBtn.addEventListener("click", () => setShot("air"));
   bounceBtn.addEventListener("click", () => setShot("bounce"));
@@ -308,46 +230,29 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
     shot = s;
     turnCard();
     panelUpdate();
-    paintCanvas();
+    pushView();
   }
   restart.addEventListener("click", reset);
   function reset() {
     state = newGame();
-    drag = null;
-    flight = null;
     note = "";
     render();
   }
 
   // --- Throwing --------------------------------------------------------
-  function launch(aim: Aim) {
+  async function launch(aim: Aim) {
     const side = state.thrower;
     const defender = other(side);
-    const origin = BALL_START[side];
-    const result = resolveThrow(origin, aim, shot, defender, state.cups[defender], rng);
     const thrown = shot;
-    const start = performance.now();
-
-    const step = (now: number) => {
-      const t = Math.min(1, (now - start) / FLIGHT_MS);
-      flight = {
-        pos: { x: origin.x + (result.landing.x - origin.x) * t, y: origin.y + (result.landing.y - origin.y) * t },
-        scale: thrown === "air" ? 1 + 0.5 * Math.sin(Math.PI * t) : t < 0.667 ? 1 + 0.4 * Math.sin((Math.PI * t) / 0.667) : 1 + 0.25 * Math.sin((Math.PI * (t - 0.667)) / 0.333),
-      };
-      if (t < 1) {
-        paintCanvas();
-        requestAnimationFrame(step);
-        return;
-      }
-      flight = null;
-      const before = state;
-      state = reduce(state, { type: "throw", shot: thrown, target: result.target });
-      note = describe(before, state);
-      render();
-    };
-    flight = { pos: origin, scale: 1 };
-    panelUpdate();
-    requestAnimationFrame(step);
+    const result = resolveThrow(BALL_START[side], aim, thrown, defender, state.cups[defender], rng);
+    flying = true;
+    pushView();
+    await scene.playFlight(side, result.landing, thrown);
+    flying = false;
+    const before = state;
+    state = reduce(state, { type: "throw", shot: thrown, target: result.target });
+    note = describe(before, state);
+    render();
   }
 
   function describe(before: State, after: State): string {
@@ -363,6 +268,5 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
     return "";
   }
 
-  new ResizeObserver(paintCanvas).observe(arena);
   render();
 }
