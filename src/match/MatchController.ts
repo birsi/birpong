@@ -7,7 +7,7 @@ import { ScoreCard } from "../ui/components/ScoreCard";
 import { ShotPanel } from "../ui/components/ShotPanel";
 import { ThrowLog } from "../ui/components/ThrowLog";
 import { TurnCard } from "../ui/components/TurnCard";
-import { rimNote, turnSummary, type Names } from "./narration";
+import { openingNote, rimNote, turnSummary, type Names } from "./narration";
 import { newMatch } from "./newMatch";
 import { logRows, scoreView, turnView } from "./viewModels";
 
@@ -38,6 +38,7 @@ export class MatchController {
   constructor(root: HTMLElement, seed: number) {
     this.rng = createRng(seed);
     this.state = newMatch(this.rng);
+    this.note = openingNote(this.state, NAMES);
 
     const page = new MatchPage(
       root,
@@ -60,7 +61,7 @@ export class MatchController {
 
   private restart(): void {
     this.state = newMatch(this.rng);
-    this.note = "";
+    this.note = openingNote(this.state, NAMES);
     this.render();
   }
 

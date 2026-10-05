@@ -12,6 +12,11 @@ export function turnTitle(state: State, names: Names): string {
   return `${names[state.thrower]}'s turn`.toUpperCase();
 }
 
+/** Said at the start of a match: who throws first and why. */
+export function openingNote(state: State, names: Names): string {
+  return `${names[state.first ?? state.thrower]} won rock, paper, scissors and throws first.`;
+}
+
 /** Advice under the heading while nothing else has just happened. */
 export function hint(state: State, shot: Shot): string {
   if (state.phase === "reroll") return "One last turn. Clear the whole rack to force sudden death.";

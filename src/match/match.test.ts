@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { initialState, reduce, type Action, type State } from "../domain/engine";
-import { hint, rimNote, turnSummary, turnTitle } from "./narration";
+import { hint, openingNote, rimNote, turnSummary, turnTitle } from "./narration";
 import { newMatch } from "./newMatch";
 import { logRows, scoreView, turnView } from "./viewModels";
 import { createRng } from "../domain/throw";
@@ -26,6 +26,10 @@ describe("narration", () => {
     expect(turnTitle({ ...s, phase: "reroll" }, names)).toBe("LAST CHANCE");
     expect(turnTitle({ ...s, suddenDeath: true }, names)).toBe("SUDDEN DEATH");
     expect(turnTitle({ ...s, phase: "over", winner: 1 }, names)).toBe("BOB WINS");
+  });
+  it("says who throws first", () => {
+    const s = reduce(initialState(), { type: "rps", choices: ["rock", "paper"] });
+    expect(openingNote(s, names)).toBe("Bob won rock, paper, scissors and throws first.");
   });
   it("gives a hint per shot type", () => {
     expect(hint(started(), "air")).toMatch(/both balls/);
@@ -61,6 +65,7 @@ describe("view models", () => {
     const s = play(started(), air(0));
     const view = turnView(s, "air", "", names);
     expect(view.balls?.map((b) => b.kind)).toEqual(["hit", "now"]);
+    expect(view.balls?.map((b) => b.label)).toEqual(["Ball 1 hit", "Ball 2 aiming"]);
     expect(turnView({ ...s, phase: "over", winner: 0 }, "air", "", names).balls).toBeNull();
   });
   it("prefers the note over the hint", () => {

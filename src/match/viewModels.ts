@@ -49,9 +49,12 @@ export function turnView(state: State, shot: Shot, note: string, names: Names): 
         const n = i + 1;
         const done = thrown[i];
         if (done)
-          return { kind: done.hit ? "hit" : "miss", label: `${n} ${done.hit ? "hit" : "miss"}` };
-        if (i === state.ballsThrown) return { kind: "now", label: `${n} aiming` };
-        return { kind: "waiting", label: `${n}` };
+          return {
+            kind: done.hit ? "hit" : "miss",
+            label: `Ball ${n} ${done.hit ? "hit" : "miss"}`,
+          };
+        if (i === state.ballsThrown) return { kind: "now", label: `Ball ${n} aiming` };
+        return { kind: "waiting", label: `Ball ${n}` };
       });
   return { title: turnTitle(state, names), balls, text: note || hint(state, shot), over };
 }
