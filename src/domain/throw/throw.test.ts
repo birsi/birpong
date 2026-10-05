@@ -1,15 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { makeRack } from "../engine/rack";
-import {
-  BALL_START,
-  MAX_PULL,
-  MAX_RANGE,
-  aimFromPull,
-  findCup,
-  inBounceWindow,
-  nominalLanding,
-  resolveThrow,
-} from "./model";
+import { makeRack } from "../engine";
+import { inBounceWindow, aimFromPull, nominalLanding } from "./aim";
+import { BALL_START, MAX_PULL, MAX_RANGE } from "./constants";
+import { nearestCup } from "./cups";
+import { resolveThrow } from "./resolveThrow";
 import { createRng } from "./rng";
 
 const origin = BALL_START[0];
@@ -38,8 +32,8 @@ describe("landing", () => {
   });
   it("finds the cup under the landing point, nearest first", () => {
     const cups = makeRack(10);
-    expect(findCup(1, cups, { x: 240 - 31.9, y: 30 })).toBe(0);
-    expect(findCup(1, cups, { x: 120, y: 30 })).toBeNull();
+    expect(nearestCup(1, cups, { x: 240 - 31.9, y: 30 })?.id).toBe(0);
+    expect(nearestCup(1, cups, { x: 120, y: 30 })).toBeNull();
   });
   it("knows the bounce window", () => {
     expect(inBounceWindow(0.7)).toBe(true);

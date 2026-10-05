@@ -1,7 +1,7 @@
-import "./ui/theme.css";
-import "./ui/base.css";
-import "./ui/match.css";
-import { mountMatch } from "./ui/match";
+import { MatchController } from "./match/MatchController";
+import "./ui/styles/theme.css";
+import "./ui/styles/base.css";
+import "./ui/styles/match.css";
 
-const app = document.getElementById("app");
-if (app) mountMatch(app);
+const root = document.getElementById("app");
+if (root) new MatchController(root, Date.now());

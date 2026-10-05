@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { makeRack, reRack, slotPosition } from "./rack";
-import { initialState, reduce } from "./reduce";
+import { reduce } from "./reduce";
+import { initialState } from "./state";
 import type { Action, State } from "./types";
 
 const play = (s: State, ...a: Action[]) => a.reduce(reduce, s);

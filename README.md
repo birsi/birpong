@@ -30,11 +30,12 @@ Requires Node.js 20 or newer.
 
 ```sh
 npm install
-npm test          # run the engine tests
-npm run typecheck
+npm run dev            # play a hot-seat match in the browser
+npm run check          # typecheck + lint + tests
+npm test               # tests only
+npm run format         # Prettier
+npm run build          # production bundle
 ```
-
-`npm run dev` starts a two-player hot-seat match in the browser (the CPU opponent is not built yet). `npm run build` makes a production bundle.
 
 ## Stack
 
@@ -44,16 +45,21 @@ TypeScript, Vite, Vitest. The table scene runs on [Phaser 4](https://phaser.io);
 
 ```
 docs/
-  SPEC.md          rules, modes, screens, open decisions
-  design/          static HTML screens, PNG renders, colour tokens
+  SPEC.md            rules, modes, screens, open decisions
+  design/            static HTML screens, PNG renders, colour tokens
 src/
-  engine/          pure rules state machine and tests
-  throw/           aim, scatter and hit model, seeded RNG
-  game/            Phaser table scene (drawing, drag, animation)
-  ui/              match screen, styles
+  domain/            pure game logic: no DOM, no Phaser scene
+    engine/          rules state machine (rps, throw, turn, sudden death) and tests
+    throw/           aim, scatter, cup rim and ricochet model, seeded RNG, tuning constants
+  game/              Phaser: TableScene composes parts/ (backdrop, cups, aim, ball flight, drag)
+  match/             MatchController wires domain, game and UI; narration and view models are pure
+  ui/                DOM components and styles
 ```
 
-The engine is a pure, deterministic state machine that knows nothing about rendering or networking. Solo, online and stats will all run on it.
+Dependencies point one way: `domain` <- `game` and `ui` <- `match` <- `main.ts`.
+The engine is a deterministic state machine that knows nothing about rendering or networking;
+solo, online and stats will all run on it. Throw outcomes come from a seeded model in
+`domain/throw`, not from simulated physics, so the same seed always replays the same match.
 
 ## Roadmap
 
