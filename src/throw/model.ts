@@ -169,15 +169,15 @@ export function resolveThrow(
   // Rim: the closer to the edge, the likelier the ball bounces out.
   const edge = (cup.dist - CUP_CORE) / (CUP_RADIUS - CUP_CORE);
   const chanceIn = RIM_IN_INNER + (RIM_IN_OUTER - RIM_IN_INNER) * edge;
-  if (rng() < chanceIn) return { landing, target: cup.id, contact: "rattle-in", touched: cup.id, deflect: null };
+  if (rng.frac() < chanceIn) return { landing, target: cup.id, contact: "rattle-in", touched: cup.id, deflect: null };
 
   // Away from the cup centre, with a little sideways jitter.
-  const away = Math.atan2(landing.y - cup.center.y, landing.x - cup.center.x) + (rng() - 0.5) * 0.8;
+  const away = Math.atan2(landing.y - cup.center.y, landing.x - cup.center.x) + (rng.frac() - 0.5) * 0.8;
   const neighbour = ricochetCup(defender, cups, cup, away);
-  if (neighbour && rng() < RICOCHET_CHANCE) {
+  if (neighbour && rng.frac() < RICOCHET_CHANCE) {
     return { landing, target: neighbour.id, contact: "ricochet", touched: cup.id, deflect: neighbour.center };
   }
-  const travel = DEFLECT_MIN + rng() * (DEFLECT_MAX - DEFLECT_MIN);
+  const travel = DEFLECT_MIN + rng.frac() * (DEFLECT_MAX - DEFLECT_MIN);
   const deflect = { x: landing.x + Math.cos(away) * travel, y: landing.y + Math.sin(away) * travel };
   return { landing, target: null, contact: "bounce-out", touched: cup.id, deflect };
 }

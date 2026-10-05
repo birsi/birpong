@@ -4,7 +4,7 @@ import { initialState, reduce } from "../engine/reduce";
 import { CUPS_PER_SIDE } from "../engine/rack";
 import type { Rps, Shot, Side, State } from "../engine/types";
 import { BOUNCE_WINDOW, resolveThrow, BALL_START, type Aim, type Contact } from "../throw/model";
-import { mulberry32, type Rng } from "../throw/rng";
+import { createRng, type Rng } from "../throw/rng";
 
 const NAMES: [string, string] = ["Player 1", "Player 2"];
 const RPS: Rps[] = ["rock", "paper", "scissors"];
@@ -17,7 +17,7 @@ const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
 };
 
 export function mountMatch(root: HTMLElement, seed = Date.now()): void {
-  const rng: Rng = mulberry32(seed);
+  const rng: Rng = createRng(seed);
   let state = newGame();
   let shot: Shot = "air";
   let dragPower = 0;
@@ -27,7 +27,7 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
   function newGame(): State {
     let s = initialState();
     while (s.phase === "rps") {
-      const pick = () => RPS[Math.floor(rng() * 3)]!;
+      const pick = () => rng.pick(RPS);
       s = reduce(s, { type: "rps", choices: [pick(), pick()] });
     }
     return s;

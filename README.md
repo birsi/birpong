@@ -38,7 +38,7 @@ npm run typecheck
 
 ## Stack
 
-TypeScript, Vite, Vitest. The table scene runs on [Phaser 4](https://phaser.io); the rules engine and throw model are plain TypeScript with no Phaser dependency.
+TypeScript, Vite, Vitest. The table scene runs on [Phaser 4](https://phaser.io); the rules engine and throw model run without a browser (the throw model only uses Phaser's seeded `RandomDataGenerator`).
 
 ## Project layout
 

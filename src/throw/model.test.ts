@@ -10,7 +10,7 @@ import {
   nominalLanding,
   resolveThrow,
 } from "./model";
-import { mulberry32 } from "./rng";
+import { createRng } from "./rng";
 
 const origin = BALL_START[0];
 
@@ -65,15 +65,15 @@ describe("resolveThrow", () => {
 
   it("is reproducible for a seed", () => {
     const aim = aimAt(exact(Math.hypot(tip.x - origin.x, tip.y - origin.y)));
-    const a = resolveThrow(origin, aim, "air", 1, cups, mulberry32(7));
-    const b = resolveThrow(origin, aim, "air", 1, cups, mulberry32(7));
+    const a = resolveThrow(origin, aim, "air", 1, cups, createRng(7));
+    const b = resolveThrow(origin, aim, "air", 1, cups, createRng(7));
     expect(a).toEqual(b);
   });
   it("hits the targeted cup more often with air than with bounce", () => {
     const power = exact(Math.hypot(tip.x - origin.x, tip.y - origin.y));
     const aim = aimAt(power);
     const rate = (shot: "air" | "bounce") => {
-      const rng = mulberry32(1);
+      const rng = createRng(1);
       let hits = 0;
       for (let i = 0; i < 2000; i++) {
         if (resolveThrow(origin, aim, shot, 1, cups, rng).target !== null) hits++;
@@ -87,7 +87,7 @@ describe("resolveThrow", () => {
   });
   it("never hits with a bounce outside the window", () => {
     const aim = aimAt(0.9);
-    const rng = mulberry32(3);
+    const rng = createRng(3);
     for (let i = 0; i < 200; i++) {
       expect(resolveThrow(origin, aim, "bounce", 1, cups, rng).target).toBeNull();
     }
@@ -106,7 +106,7 @@ describe("cup rim", () => {
       x: origin.x - (dx / len) * MAX_PULL * (len / MAX_RANGE),
       y: origin.y - (dy / len) * MAX_PULL * (len / MAX_RANGE),
     })!;
-    return resolveThrow(origin, aim, "air", 1, cups, mulberry32(seed));
+    return resolveThrow(origin, aim, "air", 1, cups, createRng(seed));
   };
 
   it("reports a clean, rattle-in or bounce-out contact consistently with the target", () => {
