@@ -144,7 +144,10 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
     const left = el("div", side === 0 ? "stack" : "stack stack--end");
     left.append(who, dots(side));
     const count = el("div", "count");
-    count.append(el("span", "count__n", String(state.cups[side].length)), el("span", "count__l", "cups left"));
+    count.append(
+      el("span", "count__n", String(state.cups[side].length)),
+      el("span", "count__l", "cups left"),
+    );
     card.replaceChildren(...(side === 0 ? [left, count] : [count, left]));
   }
 
@@ -164,8 +167,20 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
       const done = state.log.slice(state.log.length - state.ballsThrown);
       for (let i = 0; i < 2; i++) {
         const r = done[i];
-        const cls = r ? (r.hit ? "turn__ball turn__ball--hit" : "turn__ball turn__ball--miss") : i === state.ballsThrown ? "turn__ball turn__ball--now" : "turn__ball";
-        const text = r ? (r.hit ? `${i + 1} hit` : `${i + 1} miss`) : i === state.ballsThrown ? `${i + 1} aiming` : `${i + 1}`;
+        const cls = r
+          ? r.hit
+            ? "turn__ball turn__ball--hit"
+            : "turn__ball turn__ball--miss"
+          : i === state.ballsThrown
+            ? "turn__ball turn__ball--now"
+            : "turn__ball";
+        const text = r
+          ? r.hit
+            ? `${i + 1} hit`
+            : `${i + 1} miss`
+          : i === state.ballsThrown
+            ? `${i + 1} aiming`
+            : `${i + 1}`;
         const b = el("span", cls);
         b.append(el("i"), document.createTextNode(text));
         balls.append(b);
@@ -183,7 +198,8 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
   }
 
   function hint(): string {
-    if (state.phase === "reroll") return "One last turn. Clear the whole rack to force sudden death.";
+    if (state.phase === "reroll")
+      return "One last turn. Clear the whole rack to force sudden death.";
     if (shot === "bounce") return "A bounce hit takes 2 cups. Land it inside the marked window.";
     return "Hit with both balls and both come back.";
   }
@@ -192,8 +208,17 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
     logList.replaceChildren();
     for (const r of state.log.slice(-5).reverse()) {
       const li = el("li");
-      const result = r.hit ? (state.pending.length && r.turn === state.turn ? "hit, cup leaves at turn end" : "hit") : "miss";
-      li.append(el("span", undefined, `T${r.turn}`), el("span", undefined, NAMES[r.side]), el("span", undefined, r.shot), el("span", undefined, result));
+      const result = r.hit
+        ? state.pending.length && r.turn === state.turn
+          ? "hit, cup leaves at turn end"
+          : "hit"
+        : "miss";
+      li.append(
+        el("span", undefined, `T${r.turn}`),
+        el("span", undefined, NAMES[r.side]),
+        el("span", undefined, r.shot),
+        el("span", undefined, result),
+      );
       logList.append(li);
     }
   }
@@ -264,13 +289,17 @@ export function mountMatch(root: HTMLElement, seed = Date.now()): void {
 
   function describe(before: State, after: State): string {
     if (after.phase === "over") return "";
-    if (after.phase === "reroll" && before.phase !== "reroll") return `${NAMES[before.thrower]} cleared the rack. ${NAMES[after.thrower]} gets one last turn.`;
+    if (after.phase === "reroll" && before.phase !== "reroll")
+      return `${NAMES[before.thrower]} cleared the rack. ${NAMES[after.thrower]} gets one last turn.`;
     if (after.suddenDeath && !before.suddenDeath) return "Sudden death. New 3-cup racks.";
-    if (after.thrower === before.thrower && after.ballsThrown === 0 && after.ballsBackUsed) return "Both balls hit. Balls back!";
+    if (after.thrower === before.thrower && after.ballsThrown === 0 && after.ballsBackUsed)
+      return "Both balls hit. Balls back!";
     if (after.thrower !== before.thrower) {
       const left = after.cups[before.thrower === 0 ? 1 : 0].length;
       const lost = before.cups[before.thrower === 0 ? 1 : 0].length - left;
-      return lost > 0 ? `${NAMES[before.thrower]} sank ${lost} ${lost === 1 ? "cup" : "cups"}. ${left} left.` : `${NAMES[before.thrower]} missed.`;
+      return lost > 0
+        ? `${NAMES[before.thrower]} sank ${lost} ${lost === 1 ? "cup" : "cups"}. ${left} left.`
+        : `${NAMES[before.thrower]} missed.`;
     }
     return "";
   }

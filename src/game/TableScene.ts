@@ -48,7 +48,10 @@ const cssColor = (name: string): number => {
 
 export class TableScene extends Phaser.Scene {
   private view: SceneView | null = null;
-  private colors!: Record<"surface" | "raised" | "muted" | "text" | "strong" | "accent" | "ground", number>;
+  private colors!: Record<
+    "surface" | "raised" | "muted" | "text" | "strong" | "accent" | "ground",
+    number
+  >;
   private cups = new Map<string, { body: Phaser.GameObjects.Arc; dot: Phaser.GameObjects.Arc }>();
   private holes!: Phaser.GameObjects.Graphics;
   private aimLayer!: Phaser.GameObjects.Graphics;
@@ -82,26 +85,40 @@ export class TableScene extends Phaser.Scene {
     const lw = 0.75 * U;
     for (const side of [0, 1] as const) {
       for (let id = 0; id < CUPS_PER_SIDE; id++) {
-        const body = this.add.circle(0, 0, CUP_RADIUS * U - lw / 2, c.surface).setStrokeStyle(lw, c.strong);
+        const body = this.add
+          .circle(0, 0, CUP_RADIUS * U - lw / 2, c.surface)
+          .setStrokeStyle(lw, c.strong);
         const dot = this.add.circle(0, 0, (CUP_RADIUS / 4) * U, c.strong);
         this.cups.set(`${side}:${id}`, { body, dot });
       }
     }
-    this.targetRing = this.add.circle(0, 0, (CUP_RADIUS + 0.9) * U).setStrokeStyle(0.45 * U, c.accent).setVisible(false);
+    this.targetRing = this.add
+      .circle(0, 0, (CUP_RADIUS + 0.9) * U)
+      .setStrokeStyle(0.45 * U, c.accent)
+      .setVisible(false);
     this.aimLayer = this.add.graphics();
 
     const ball = (side: Side) => {
       const pos = toPx(BALL_START[side]);
-      const ring = this.add.circle(pos.x, pos.y, (BALL_R + 0.7) * U).setStrokeStyle(0.5 * U, c.accent);
+      const ring = this.add
+        .circle(pos.x, pos.y, (BALL_R + 0.7) * U)
+        .setStrokeStyle(0.5 * U, c.accent);
       const body = this.add.circle(pos.x, pos.y, BALL_R * U, c.strong);
       return { body, ring };
     };
     this.balls = { 0: ball(0), 1: ball(1) };
-    this.flightBall = this.add.circle(0, 0, BALL_R * U, c.strong).setVisible(false).setDepth(10);
+    this.flightBall = this.add
+      .circle(0, 0, BALL_R * U, c.strong)
+      .setVisible(false)
+      .setDepth(10);
 
     const label = (x: number, align: number) =>
       this.add
-        .text(x * U, 3.5 * U, "", { fontFamily: '"JetBrains Mono", monospace', fontSize: `${2.7 * U}px`, color: "#d4d4d8" })
+        .text(x * U, 3.5 * U, "", {
+          fontFamily: '"JetBrains Mono", monospace',
+          fontSize: `${2.7 * U}px`,
+          color: "#d4d4d8",
+        })
         .setOrigin(align, 0);
     this.labels = [label(3.6, 0), label(SCENE_W - 3.6, 1)];
     // Redraw once web fonts are loaded so the labels do not stay in the fallback font.
@@ -136,7 +153,13 @@ export class TableScene extends Phaser.Scene {
         const pos = toPx(slotPosition(side, cup.slot));
         if (obj.body.visible && (obj.body.x !== pos.x || obj.body.y !== pos.y)) {
           // Re-rack: slide the cup (and its hit dot) to the new slot.
-          this.tweens.add({ targets: [obj.body, obj.dot], x: pos.x, y: pos.y, duration: 250, ease: "Sine.easeInOut" });
+          this.tweens.add({
+            targets: [obj.body, obj.dot],
+            x: pos.x,
+            y: pos.y,
+            duration: 250,
+            ease: "Sine.easeInOut",
+          });
         } else {
           obj.body.setPosition(pos.x, pos.y);
           obj.dot.setPosition(pos.x, pos.y);
@@ -176,8 +199,21 @@ export class TableScene extends Phaser.Scene {
         const a = toPx(from);
         const b = toPx(to);
         ball.setPosition(a.x, a.y);
-        this.tweens.add({ targets: ball, scale: peak, duration: duration / 2, yoyo: true, ease: "Sine.easeOut" });
-        this.tweens.add({ targets: ball, x: b.x, y: b.y, duration, ease, onComplete: () => resolve() });
+        this.tweens.add({
+          targets: ball,
+          scale: peak,
+          duration: duration / 2,
+          yoyo: true,
+          ease: "Sine.easeOut",
+        });
+        this.tweens.add({
+          targets: ball,
+          x: b.x,
+          y: b.y,
+          duration,
+          ease,
+          onComplete: () => resolve(),
+        });
       });
     const tween = (config: Phaser.Types.Tweens.TweenBuilderConfig) =>
       new Promise<void>((resolve) => this.tweens.add({ ...config, onComplete: () => resolve() }));
@@ -190,12 +226,21 @@ export class TableScene extends Phaser.Scene {
       await hop(mid, landing, 220, 1.25);
     }
 
-    const cup = result.touched !== null ? this.cups.get(`${defender}:${result.touched}`) : undefined;
+    const cup =
+      result.touched !== null ? this.cups.get(`${defender}:${result.touched}`) : undefined;
     const cupPos = cup ? { x: cup.body.x, y: cup.body.y } : null;
 
     if (result.contact === "clean" && cupPos) {
       // Straight in: drop into the cup.
-      await tween({ targets: ball, x: cupPos.x, y: cupPos.y, scale: 0.4, alpha: 0.2, duration: 220, ease: "Quad.easeIn" });
+      await tween({
+        targets: ball,
+        x: cupPos.x,
+        y: cupPos.y,
+        scale: 0.4,
+        alpha: 0.2,
+        duration: 220,
+        ease: "Quad.easeIn",
+      });
     } else if (result.contact === "rattle-in" && cupPos) {
       // Clips the rim, circles it, then drops in.
       await this.rattle(ball, cup!.body, cupPos, toPx(landing));
@@ -210,7 +255,15 @@ export class TableScene extends Phaser.Scene {
       const to = this.cups.get(`${defender}:${result.target}`);
       const dest = to ? { x: to.body.x, y: to.body.y } : toPx(result.deflect);
       await hop(landing, result.deflect, 300, 1.5, "Quad.easeOut");
-      await tween({ targets: ball, x: dest.x, y: dest.y, scale: 0.4, alpha: 0.2, duration: 200, ease: "Quad.easeIn" });
+      await tween({
+        targets: ball,
+        x: dest.x,
+        y: dest.y,
+        scale: 0.4,
+        alpha: 0.2,
+        duration: 200,
+        ease: "Quad.easeIn",
+      });
     } else {
       await tween({ targets: ball, alpha: 0, duration: 200 });
     }
@@ -218,11 +271,23 @@ export class TableScene extends Phaser.Scene {
   }
 
   private wobble(cup: Phaser.GameObjects.Arc, peak: number): void {
-    this.tweens.add({ targets: cup, scale: peak, duration: 70, yoyo: true, repeat: 1, ease: "Sine.easeOut" });
+    this.tweens.add({
+      targets: cup,
+      scale: peak,
+      duration: 70,
+      yoyo: true,
+      repeat: 1,
+      ease: "Sine.easeOut",
+    });
   }
 
   /** Orbit the rim with a shrinking radius, then drop in. */
-  private rattle(ball: Phaser.GameObjects.Arc, cupBody: Phaser.GameObjects.Arc, center: Point, from: Point): Promise<void> {
+  private rattle(
+    ball: Phaser.GameObjects.Arc,
+    cupBody: Phaser.GameObjects.Arc,
+    center: Point,
+    from: Point,
+  ): Promise<void> {
     const start = Math.atan2(from.y - center.y, from.x - center.x);
     const r0 = Math.max(Math.hypot(from.x - center.x, from.y - center.y), 2 * U);
     const state = { t: 0 };
@@ -236,10 +301,22 @@ export class TableScene extends Phaser.Scene {
         onUpdate: () => {
           const angle = start + state.t * Math.PI * 3.5;
           const radius = r0 * (1 - state.t * 0.85);
-          ball.setPosition(center.x + Math.cos(angle) * radius, center.y + Math.sin(angle) * radius);
+          ball.setPosition(
+            center.x + Math.cos(angle) * radius,
+            center.y + Math.sin(angle) * radius,
+          );
         },
         onComplete: () => {
-          this.tweens.add({ targets: ball, x: center.x, y: center.y, scale: 0.4, alpha: 0.2, duration: 160, ease: "Quad.easeIn", onComplete: () => resolve() });
+          this.tweens.add({
+            targets: ball,
+            x: center.x,
+            y: center.y,
+            scale: 0.4,
+            alpha: 0.2,
+            duration: 160,
+            ease: "Quad.easeIn",
+            onComplete: () => resolve(),
+          });
         },
       });
     });
@@ -266,7 +343,11 @@ export class TableScene extends Phaser.Scene {
       [2.2, 6.15, 2.2, 53.85, 43.5, 30],
       [237.8, 6.15, 237.8, 53.85, 196.5, 30],
     ]) {
-      const [a, b, cc] = [toPx({ x: tri[0]!, y: tri[1]! }), toPx({ x: tri[2]!, y: tri[3]! }), toPx({ x: tri[4]!, y: tri[5]! })];
+      const [a, b, cc] = [
+        toPx({ x: tri[0]!, y: tri[1]! }),
+        toPx({ x: tri[2]!, y: tri[3]! }),
+        toPx({ x: tri[4]!, y: tri[5]! }),
+      ];
       g.strokeTriangle(a.x, a.y, b.x, b.y, cc.x, cc.y);
     }
   }
@@ -281,7 +362,13 @@ export class TableScene extends Phaser.Scene {
     const segments = 16;
     for (let i = 0; i < segments; i += 2) {
       this.holes.beginPath();
-      this.holes.arc(center.x, center.y, radius, (i / segments) * Math.PI * 2, ((i + 1) / segments) * Math.PI * 2);
+      this.holes.arc(
+        center.x,
+        center.y,
+        radius,
+        (i / segments) * Math.PI * 2,
+        ((i + 1) / segments) * Math.PI * 2,
+      );
       this.holes.strokePath();
     }
   }
@@ -293,7 +380,12 @@ export class TableScene extends Phaser.Scene {
     for (let d = 0; d < len; d += dash + gap) {
       const t0 = d / len;
       const t1 = Math.min(d + dash, len) / len;
-      g.lineBetween(a.x + (b.x - a.x) * t0, a.y + (b.y - a.y) * t0, a.x + (b.x - a.x) * t1, a.y + (b.y - a.y) * t1);
+      g.lineBetween(
+        a.x + (b.x - a.x) * t0,
+        a.y + (b.y - a.y) * t0,
+        a.x + (b.x - a.x) * t1,
+        a.y + (b.y - a.y) * t1,
+      );
     }
   }
 
@@ -317,7 +409,11 @@ export class TableScene extends Phaser.Scene {
     const len = Math.hypot(to.x - from.x, to.y - from.y);
     const step = 1.8 * U;
     for (let d = step; d < len; d += step) {
-      g.fillCircle(from.x + ((to.x - from.x) * d) / len, from.y + ((to.y - from.y) * d) / len, 0.28 * U);
+      g.fillCircle(
+        from.x + ((to.x - from.x) * d) / len,
+        from.y + ((to.y - from.y) * d) / len,
+        0.28 * U,
+      );
     }
 
     // landing ring (filled and wider for bounce)
@@ -355,7 +451,9 @@ export class TableScene extends Phaser.Scene {
     const ball = BALL_START[view.state.thrower];
     const at = this.cm(p);
     if (Math.hypot(at.x - ball.x, at.y - ball.y) > GRAB_RADIUS) return;
-    this.setDrag(aimFromPull(ball, at) ?? { dir: { x: ball.x < 120 ? 1 : -1, y: 0 }, power: 0, handle: ball });
+    this.setDrag(
+      aimFromPull(ball, at) ?? { dir: { x: ball.x < 120 ? 1 : -1, y: 0 }, power: 0, handle: ball },
+    );
   }
 
   private onMove(p: Phaser.Input.Pointer): void {

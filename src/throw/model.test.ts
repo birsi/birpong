@@ -114,7 +114,8 @@ describe("cup rim", () => {
     for (let seed = 1; seed <= 400; seed++) {
       const r = landAt(0, seed);
       seen.add(r.contact);
-      if (r.contact === "clean" || r.contact === "rattle-in" || r.contact === "ricochet") expect(r.target).not.toBeNull();
+      if (r.contact === "clean" || r.contact === "rattle-in" || r.contact === "ricochet")
+        expect(r.target).not.toBeNull();
       if (r.contact === "bounce-out") {
         expect(r.target).toBeNull();
         expect(r.touched).not.toBeNull();
@@ -142,7 +143,8 @@ describe("cup rim", () => {
   });
 
   it("rim landings drop in less often than centre landings", () => {
-    const rate = (contacts: string[]) => contacts.filter((c) => c === "rattle-in" || c === "clean").length / contacts.length;
+    const rate = (contacts: string[]) =>
+      contacts.filter((c) => c === "rattle-in" || c === "clean").length / contacts.length;
     const all: string[] = [];
     for (let seed = 1; seed <= 2000; seed++) all.push(landAt(0, seed).contact);
     const touched = all.filter((c) => c !== "none");

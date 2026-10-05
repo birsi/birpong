@@ -43,5 +43,4 @@ export interface State {
 }
 
 export type Action =
-  | { type: "rps"; choices: [Rps, Rps] }
-  | { type: "throw"; shot: Shot; target: number | null };
+  { type: "rps"; choices: [Rps, Rps] } | { type: "throw"; shot: Shot; target: number | null };

@@ -41,7 +41,7 @@ function reduceThrow(state: State, shot: "air" | "bounce", target: number | null
   const defender = other(state.thrower);
   const rack = state.cups[defender];
 
-  let marked: number[] = [];
+  const marked: number[] = [];
   let slot: number | null = null;
   const hit = target !== null;
   if (target !== null) {
@@ -129,7 +129,13 @@ function endSuddenDeathTurn(base: State, swap: State): State {
   const [a, b] = [base.cups[0].length, base.cups[1].length];
   if (a === b) {
     // Still level: start the next pair of turns, refilling if both racks are empty.
-    const next = a === 0 ? { ...swap, cups: [makeRack(SUDDEN_DEATH_CUPS), makeRack(SUDDEN_DEATH_CUPS)] as State["cups"] } : swap;
+    const next =
+      a === 0
+        ? {
+            ...swap,
+            cups: [makeRack(SUDDEN_DEATH_CUPS), makeRack(SUDDEN_DEATH_CUPS)] as State["cups"],
+          }
+        : swap;
     return { ...next, thrower: base.first! };
   }
   return { ...base, phase: "over", winner: a > b ? 0 : 1 };

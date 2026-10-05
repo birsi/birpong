@@ -109,7 +109,11 @@ export interface ThrowResult {
 }
 
 /** Nearest cup whose rim the landing point touches, with its distance. */
-function nearestCup(defender: Side, cups: readonly Cup[], landing: Point): { id: number; dist: number; center: Point } | null {
+function nearestCup(
+  defender: Side,
+  cups: readonly Cup[],
+  landing: Point,
+): { id: number; dist: number; center: Point } | null {
   let best: { id: number; dist: number; center: Point } | null = null;
   for (const cup of cups) {
     const center = slotPosition(defender, cup.slot);
@@ -158,26 +162,44 @@ export function resolveThrow(
     x: nominal.x + gaussian(rng) * sigma,
     y: nominal.y + gaussian(rng) * sigma,
   };
-  const miss: ThrowResult = { landing, target: null, contact: "none", touched: null, deflect: null };
+  const miss: ThrowResult = {
+    landing,
+    target: null,
+    contact: "none",
+    touched: null,
+    deflect: null,
+  };
   // A bounce outside the power window dies on the table or clears the rack.
   if (shot === "bounce" && !inBounceWindow(aim.power)) return miss;
 
   const cup = nearestCup(defender, cups, landing);
   if (!cup) return miss;
-  if (cup.dist <= CUP_CORE) return { landing, target: cup.id, contact: "clean", touched: cup.id, deflect: null };
+  if (cup.dist <= CUP_CORE)
+    return { landing, target: cup.id, contact: "clean", touched: cup.id, deflect: null };
 
   // Rim: the closer to the edge, the likelier the ball bounces out.
   const edge = (cup.dist - CUP_CORE) / (CUP_RADIUS - CUP_CORE);
   const chanceIn = RIM_IN_INNER + (RIM_IN_OUTER - RIM_IN_INNER) * edge;
-  if (rng.frac() < chanceIn) return { landing, target: cup.id, contact: "rattle-in", touched: cup.id, deflect: null };
+  if (rng.frac() < chanceIn)
+    return { landing, target: cup.id, contact: "rattle-in", touched: cup.id, deflect: null };
 
   // Away from the cup centre, with a little sideways jitter.
-  const away = Math.atan2(landing.y - cup.center.y, landing.x - cup.center.x) + (rng.frac() - 0.5) * 0.8;
+  const away =
+    Math.atan2(landing.y - cup.center.y, landing.x - cup.center.x) + (rng.frac() - 0.5) * 0.8;
   const neighbour = ricochetCup(defender, cups, cup, away);
   if (neighbour && rng.frac() < RICOCHET_CHANCE) {
-    return { landing, target: neighbour.id, contact: "ricochet", touched: cup.id, deflect: neighbour.center };
+    return {
+      landing,
+      target: neighbour.id,
+      contact: "ricochet",
+      touched: cup.id,
+      deflect: neighbour.center,
+    };
   }
   const travel = DEFLECT_MIN + rng.frac() * (DEFLECT_MAX - DEFLECT_MIN);
-  const deflect = { x: landing.x + Math.cos(away) * travel, y: landing.y + Math.sin(away) * travel };
+  const deflect = {
+    x: landing.x + Math.cos(away) * travel,
+    y: landing.y + Math.sin(away) * travel,
+  };
   return { landing, target: null, contact: "bounce-out", touched: cup.id, deflect };
 }
