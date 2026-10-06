@@ -44,3 +44,12 @@ export const RICOCHET_CHANCE = 0.12;
 export const RICOCHET_REACH = 13;
 /** The neighbour must lie within this angle (rad) of the kick direction. */
 export const RICOCHET_ARC = 0.7;
+
+// --- Missing inside the rack
+/** A ball that misses inside the rack bounces out; its direction is spread over this angle (rad). */
+export const EXIT_SPREAD = 1.6;
+/** Extra distance (cm) the ball travels beyond the rack outline before it settles. */
+export const EXIT_EXTRA_MIN = 5;
+export const EXIT_EXTRA_MAX = 13;
+/** Closest a bouncing ball gets to the long table edges (cm). */
+export const TABLE_MARGIN = 3;

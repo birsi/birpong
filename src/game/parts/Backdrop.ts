@@ -1,21 +1,8 @@
 import type Phaser from "phaser";
+import { rackOutline } from "../../domain/engine";
 import type { Point } from "../../domain/geometry";
 import { SCENE_H, SCENE_W, TABLE_X, TABLE_Y, U, toPx } from "../layout";
 import { toCssColor, type Palette } from "../palette";
-
-/** Rack outlines (triangles) in table cm, one per end. */
-const RACK_OUTLINES = [
-  [
-    { x: 2.2, y: 6.15 },
-    { x: 2.2, y: 53.85 },
-    { x: 43.5, y: 30 },
-  ],
-  [
-    { x: 237.8, y: 6.15 },
-    { x: 237.8, y: 53.85 },
-    { x: 196.5, y: 30 },
-  ],
-] as const;
 
 /** The static picture: throwing zones, table, centre circle, rack outlines and the side labels. */
 export class Backdrop {
@@ -75,8 +62,8 @@ export class Backdrop {
     g.fillStyle(c.ground).fillCircle(mid.x, mid.y, 9 * U);
     g.lineStyle(0.4 * U, c.muted).strokeCircle(mid.x, mid.y, 9 * U);
 
-    for (const outline of RACK_OUTLINES) {
-      const [a, b, tip] = outline.map(toPx) as [Point, Point, Point];
+    for (const side of [0, 1] as const) {
+      const [a, b, tip] = rackOutline(side).map(toPx) as [Point, Point, Point];
       g.strokeTriangle(a.x, a.y, b.x, b.y, tip.x, tip.y);
     }
   }

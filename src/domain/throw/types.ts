@@ -19,6 +19,11 @@ export interface ThrowResult {
   contact: Contact;
   /** Cup id the ball touched (also set for a bounce-out, where target is null). */
   touched: number | null;
-  /** Where a ball that bounced off the rim ends up (the neighbouring cup's centre for a ricochet). */
+  /** The neighbouring cup's centre when the ball ricochets into it, otherwise null. */
   deflect: Point | null;
+  /**
+   * Hops a missed ball makes after landing, the last being where it comes to rest. A ball that
+   * misses inside the rack bounces off the cups until it is out of the rack area.
+   */
+  bounces: Point[];
 }

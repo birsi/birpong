@@ -75,8 +75,7 @@ export class BallFlight {
         break;
       case "bounce-out":
         this.cups.wobble(defender, result.touched!, 1.12);
-        if (result.deflect) await this.hop(ball, landing, result.deflect, 380, 1.7, "Quad.easeOut");
-        await this.fade(ball);
+        await this.bounceAway(ball, landing, result.bounces);
         break;
       case "ricochet": {
         this.cups.wobble(defender, result.touched!, 1.12);
@@ -87,7 +86,7 @@ export class BallFlight {
         break;
       }
       default:
-        await this.fade(ball);
+        await this.bounceAway(ball, landing, result.bounces);
     }
     ball.setVisible(false).setAlpha(1).setScale(1);
   }
@@ -112,6 +111,26 @@ export class BallFlight {
       ease: "Sine.easeOut",
     });
     return this.tween({ targets: ball, x: b.x, y: b.y, duration, ease });
+  }
+
+  /**
+   * A miss: hop on through the given points, each hop lower than the last, and let the ball roll
+   * to a stop. A ball that missed inside the rack thus bounces off the cups and out of the rack.
+   */
+  private async bounceAway(
+    ball: Phaser.GameObjects.Arc,
+    from: Point,
+    bounces: Point[],
+  ): Promise<void> {
+    let at = from;
+    for (const [i, next] of bounces.entries()) {
+      const cm = Math.hypot(next.x - at.x, next.y - at.y);
+      const duration = Math.min(420, Math.max(180, cm * 16));
+      const last = i === bounces.length - 1;
+      await this.hop(ball, at, next, duration, 1.7 - i * 0.25, last ? "Quad.easeOut" : "Linear");
+      at = next;
+    }
+    await this.fade(ball);
   }
 
   private sink(ball: Phaser.GameObjects.Arc, at: Point, duration: number): Promise<void> {

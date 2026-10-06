@@ -3,6 +3,7 @@ import { makeRack } from "../engine";
 import { inBounceWindow, aimFromPull, nominalLanding } from "./aim";
 import { BALL_START, MAX_PULL, MAX_RANGE } from "./constants";
 import { nearestCup } from "./cups";
+import { inRack } from "./rackExit";
 import { resolveThrow } from "./resolveThrow";
 import { createRng } from "./rng";
 
@@ -113,7 +114,7 @@ describe("cup rim", () => {
       if (r.contact === "bounce-out") {
         expect(r.target).toBeNull();
         expect(r.touched).not.toBeNull();
-        expect(r.deflect).not.toBeNull();
+        expect(r.bounces.length).toBeGreaterThan(0);
       }
       if (r.contact === "none") expect(r.touched).toBeNull();
     }
@@ -145,5 +146,45 @@ describe("cup rim", () => {
     // Fewer than all touches are hits, because some bounce out.
     expect(rate(touched)).toBeLessThan(1);
     expect(rate(touched)).toBeGreaterThan(0.5);
+  });
+});
+
+describe("missing inside the rack", () => {
+  const cups = makeRack(10);
+  const tip = { x: 240 - 31.9, y: 30 };
+  const aimAtTip = () => {
+    const dx = tip.x - origin.x;
+    const dy = tip.y - origin.y;
+    const len = Math.hypot(dx, dy);
+    return aimFromPull(origin, {
+      x: origin.x - (dx / len) * MAX_PULL * (len / MAX_RANGE),
+      y: origin.y - (dy / len) * MAX_PULL * (len / MAX_RANGE),
+    })!;
+  };
+
+  it("knows the rack area", () => {
+    expect(inRack(1, tip)).toBe(true);
+    expect(inRack(1, { x: 120, y: 30 })).toBe(false);
+    expect(inRack(0, { x: 20, y: 30 })).toBe(true);
+    expect(inRack(0, tip)).toBe(false);
+  });
+
+  it("bounces every miss that stays in the rack out of it, and only those", () => {
+    let leftRack = 0;
+    for (let seed = 1; seed <= 1500; seed++) {
+      const r = resolveThrow(origin, aimAtTip(), "air", 1, cups, createRng(seed));
+      const last = r.bounces.at(-1);
+      if (r.target !== null) {
+        expect(r.bounces).toHaveLength(0);
+      } else if (last) {
+        leftRack++;
+        expect(inRack(1, last)).toBe(false);
+        expect(last.y).toBeGreaterThanOrEqual(0);
+        expect(last.y).toBeLessThanOrEqual(60);
+      } else {
+        expect(inRack(1, r.landing)).toBe(false);
+      }
+    }
+    expect(leftRack).toBeGreaterThan(0);
   });
 });

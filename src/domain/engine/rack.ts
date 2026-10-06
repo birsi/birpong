@@ -38,3 +38,9 @@ export function reRack(cups: Cup[]): Cup[] {
 export function cupDistance(side: Side, a: Cup, b: Cup): number {
   return distance(slotPosition(side, a.slot), slotPosition(side, b.slot));
 }
+
+/** Triangle around a rack in cm: the two back corners, then the tip (nearest the centre line). */
+export function rackOutline(side: Side): [Point, Point, Point] {
+  const mirror = (p: Point): Point => ({ x: side === 0 ? p.x : TABLE_W - p.x, y: p.y });
+  return [mirror({ x: 2.2, y: 6.15 }), mirror({ x: 2.2, y: 53.85 }), mirror({ x: 43.5, y: 30 })];
+}
