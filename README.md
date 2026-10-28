@@ -10,8 +10,9 @@ Throw by dragging back from the ball and letting go: direction sets the aim, pul
 
 - **Solo** against a CPU on easy, medium or hard.
 - **Online** 1 v 1 in a room joined by a 4-character code or invite link. No account needed.
-- **Guest stats** stored on your device: hit rate, streaks, balls back, hits per rack position.
-- Optional sign-in to sync stats and appear on a leaderboard.
+- **Guest stats** stored on your device: hit rate, streaks, balls back, hits per rack position, recent matches.
+- **Records per opponent** as a local leaderboard.
+- No accounts: you are a guest with a nickname, and nothing is stored on a server.
 
 ## Rules
 
@@ -72,7 +73,7 @@ solo, online and stats will all run on it. Throw outcomes come from a seeded mod
 3. CPU opponent, three levels (done)
 4. Local stats (done)
 5. Online rooms
-6. Accounts and leaderboard
+6. Local leaderboard (records per opponent)
 
 ## License
 
