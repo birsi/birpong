@@ -23,7 +23,7 @@ export class FirstThrowScreen implements Screen {
     private readonly profile: ProfileStore,
   ) {
     const page = el("div", "page");
-    const header = el("header", "bar");
+    const header = el("header", "topbar");
     const brand = el("div", "inline");
     brand.append(el("span", "wordmark", "BIRPONG"), el("span", "chip", `Solo · CPU ${this.level}`));
     header.append(

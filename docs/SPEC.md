@@ -2,7 +2,7 @@
 
 Birpong is an online, playable beer pong game for the browser: 2D, bird's-eye view, minimal and slightly retro. It is built in iterations. This file records what has been decided, what the design shows, and what is still open.
 
-Status: design done, no code yet. Stack and hosting are undecided (see "Open decisions").
+Status: iterations 1 to 4 are built (rules engine, table and drag throw, solo CPU on three levels, local stats). Online rooms and accounts are not built yet.
 
 ## Sources
 

@@ -30,7 +30,7 @@ Requires Node.js 20 or newer.
 
 ```sh
 npm install
-npm run dev            # play a hot-seat match in the browser
+npm run dev            # play against the CPU in the browser
 npm run check          # typecheck + lint + tests
 npm test               # tests only
 npm run format         # Prettier
@@ -51,6 +51,10 @@ src/
   domain/            pure game logic: no DOM, no Phaser scene
     engine/          rules state machine (rps, throw, turn, sudden death) and tests
     throw/           aim, scatter, cup rim and ricochet model, seeded RNG, tuning constants
+    cpu/             CPU opponent: target, shot and aim per level
+    stats/           per-match summary and totals
+  storage/           localStorage stores (matches, nickname) behind interfaces
+  app/               screen manager and screens (home, first throw, result, stats)
   game/              Phaser: TableScene composes parts/ (backdrop, cups, aim, ball flight, drag)
   match/             MatchController wires domain, game and UI; narration and view models are pure
   ui/                DOM components and styles
@@ -65,8 +69,8 @@ solo, online and stats will all run on it. Throw outcomes come from a seeded mod
 
 1. Rules engine with tests (done)
 2. Table rendering and the drag throw (done, on Phaser 4)
-3. CPU opponent, three levels
-4. Local stats
+3. CPU opponent, three levels (done)
+4. Local stats (done)
 5. Online rooms
 6. Accounts and leaderboard
 
