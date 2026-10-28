@@ -9,6 +9,10 @@ describe("checkNickname", () => {
     expect(checkNickname("  birsi  ")).toEqual({ ok: true, name: "birsi" });
     expect(checkNickname("anna   marie")).toEqual({ ok: true, name: "anna marie" });
   });
+  it("asks for a name when nothing is entered", () => {
+    expect(checkNickname("")).toEqual({ ok: false, reason: "Please enter your name to play." });
+    expect(checkNickname("   ")).toEqual({ ok: false, reason: "Please enter your name to play." });
+  });
   it("rejects too short and too long names", () => {
     expect(checkNickname("a").ok).toBe(false);
     expect(checkNickname("   ").ok).toBe(false);

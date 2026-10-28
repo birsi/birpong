@@ -11,6 +11,7 @@ export type NameCheck = { ok: true; name: string } | { ok: false; reason: string
 /** Trim, collapse spaces and check a nickname someone typed. */
 export function checkNickname(raw: string): NameCheck {
   const name = raw.trim().replace(/\s+/g, " ");
+  if (name.length === 0) return { ok: false, reason: "Please enter your name to play." };
   if (name.length < MIN_NICKNAME || name.length > MAX_NICKNAME) {
     return { ok: false, reason: `Pick a name with ${MIN_NICKNAME} to ${MAX_NICKNAME} characters.` };
   }

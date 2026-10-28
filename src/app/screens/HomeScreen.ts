@@ -16,8 +16,6 @@ export interface HomeOptions {
   invite?: string;
 }
 
-type Lockable = HTMLButtonElement | HTMLInputElement;
-
 /**
  * The start screen. A name comes first: nothing else can be used until the player has chosen one,
  * so nobody ends up playing as a nameless guest.
@@ -25,14 +23,15 @@ type Lockable = HTMLButtonElement | HTMLInputElement;
 export class HomeScreen implements Screen {
   private level: CpuLevel = DEFAULT_LEVEL;
   private readonly levelButtons = new Map<CpuLevel, HTMLButtonElement>();
-  /** Everything that needs a name. */
-  private readonly locked: Lockable[] = [];
+  /** The cards that need a name. */
   private readonly lockedCards: HTMLElement[] = [];
   private readonly nameCard = el("section", "card card--profile");
   private readonly nameLabel = el("span", "label");
   private readonly nameInput = el("input", "field field--name");
   private readonly nameHint = el("p", "hint");
   private readonly inviteButton: HTMLButtonElement | null;
+  /** Set once the player has tried to go on, or typed, without a valid name: errors show then. */
+  private attempted = false;
   private updateJoin: () => void = () => {};
 
   constructor(
@@ -42,9 +41,10 @@ export class HomeScreen implements Screen {
     options: HomeOptions = {},
   ) {
     this.inviteButton = options.invite
-      ? button("btn btn--primary", `JOIN ROOM ${options.invite}`, () =>
-          this.nav.joinRoom(options.invite!),
-        )
+      ? button("btn btn--primary", `JOIN ROOM ${options.invite}`, () => {
+          if (this.named) this.nav.joinRoom(options.invite!);
+          else this.demandName();
+        })
       : null;
 
     const page = el("div", "page");
@@ -78,6 +78,7 @@ export class HomeScreen implements Screen {
     input.ariaLabel = "Your name";
     // Valid names are saved as you type, which unlocks the rest of the screen.
     input.addEventListener("input", () => {
+      this.attempted = true;
       this.profile.setNickname(input.value);
       this.refresh();
     });
@@ -100,28 +101,40 @@ export class HomeScreen implements Screen {
     return this.nameCard;
   }
 
-  /** Show the name state and lock or unlock everything that needs a name. */
+  private get named(): boolean {
+    return this.profile.nickname() !== null;
+  }
+
+  /** The player tried to go on without a name: say so and put the cursor in the name field. */
+  private demandName(): void {
+    this.attempted = true;
+    this.refresh();
+    this.nameInput.focus();
+    this.nameCard.classList.remove("card--shake");
+    void this.nameCard.offsetWidth; // restart the animation
+    this.nameCard.classList.add("card--shake");
+  }
+
+  /** Show the name state and mark the cards that need a name as locked. */
   private refresh(): void {
-    const saved = this.profile.nickname();
     const typed = checkNickname(this.nameInput.value);
-    const named = saved !== null;
+    const named = this.named;
+    const showError = !typed.ok && this.attempted;
 
     this.nameCard.classList.toggle("card--needed", !named);
     this.nameLabel.textContent = named ? "Playing as" : "Who are you?";
-    this.nameHint.classList.toggle("hint--error", !typed.ok && this.nameInput.value.trim() !== "");
+    this.nameInput.classList.toggle("field--invalid", showError);
+    this.nameInput.setAttribute("aria-invalid", String(showError));
+    this.nameHint.classList.toggle("hint--error", showError);
+    this.nameHint.setAttribute("role", showError ? "alert" : "status");
 
-    if (typed.ok) {
+    if (typed.ok)
       this.nameHint.textContent = "Saved. Stats are kept under this name on this device.";
-    } else if (this.nameInput.value.trim() === "") {
-      this.nameHint.textContent = "Pick a name to play. No guests.";
-    } else {
-      this.nameHint.textContent = typed.reason;
-    }
+    else if (showError) this.nameHint.textContent = typed.reason;
+    else this.nameHint.textContent = "Pick a name to play. No guests.";
 
-    for (const item of this.locked) item.disabled = !named;
     for (const card of this.lockedCards) card.classList.toggle("card--locked", !named);
     this.updateJoin();
-    if (this.inviteButton) this.inviteButton.disabled = !named;
   }
 
   // --- Modes --------------------------------------------------------------
@@ -132,22 +145,36 @@ export class HomeScreen implements Screen {
     return row;
   }
 
-  private lock<T extends Lockable>(item: T): T {
-    this.locked.push(item);
-    return item;
+  /**
+   * Without a name nothing in a card works: any click or focus inside it asks for the name
+   * instead. (Disabled buttons would just ignore the click and leave the player guessing.)
+   */
+  private needsName(card: HTMLElement): HTMLElement {
+    this.lockedCards.push(card);
+    card.addEventListener(
+      "click",
+      (e) => {
+        if (this.named) return;
+        e.preventDefault();
+        e.stopPropagation();
+        this.demandName();
+      },
+      true,
+    );
+    card.addEventListener("focusin", () => {
+      if (!this.named) this.demandName();
+    });
+    return card;
   }
 
   private soloCard(): HTMLElement {
-    const card = el("section", "card card--mode");
-    this.lockedCards.push(card);
+    const card = this.needsName(el("section", "card card--mode"));
     const levels = el("div", "segmented");
     for (const level of CPU_LEVELS) {
-      const b = this.lock(
-        button("segmented__item", levelLabel(level), () => {
-          this.level = level;
-          this.renderLevels();
-        }),
-      );
+      const b = button("segmented__item", levelLabel(level), () => {
+        this.level = level;
+        this.renderLevels();
+      });
       this.levelButtons.set(level, b);
       levels.append(b);
     }
@@ -156,17 +183,14 @@ export class HomeScreen implements Screen {
       el("p", "muted", "You against the CPU. You throw both balls."),
       el("span", "label", "CPU level"),
       levels,
-      this.lock(
-        button("btn btn--primary btn--block", "START MATCH", () => this.nav.firstThrow(this.level)),
-      ),
+      button("btn btn--primary btn--block", "START MATCH", () => this.nav.firstThrow(this.level)),
     );
     return card;
   }
 
   private onlineCard(): HTMLElement {
-    const card = el("section", "card card--mode");
-    this.lockedCards.push(card);
-    const code = this.lock(el("input", "field field--code"));
+    const card = this.needsName(el("section", "card card--mode"));
+    const code = el("input", "field field--code");
     code.placeholder = "K7QM";
     code.maxLength = 8;
     code.autocomplete = "off";
@@ -176,7 +200,8 @@ export class HomeScreen implements Screen {
       if (isRoomCode(code.value)) this.nav.joinRoom(code.value);
     };
     this.updateJoin = () => {
-      join.disabled = code.disabled || !isRoomCode(code.value);
+      // Without a name the button stays clickable so it can ask for one.
+      join.disabled = this.named && !isRoomCode(code.value);
     };
     code.addEventListener("input", () => {
       code.value = normalizeRoomCode(code.value);
@@ -193,7 +218,7 @@ export class HomeScreen implements Screen {
       el("p", "muted", "One on one. Share a room code, no account needed."),
       el("span", "label", "Room code"),
       joinRow,
-      this.lock(button("btn btn--primary btn--block", "CREATE ROOM", () => this.nav.createRoom())),
+      button("btn btn--primary btn--block", "CREATE ROOM", () => this.nav.createRoom()),
     );
     return card;
   }

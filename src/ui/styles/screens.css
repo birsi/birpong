@@ -479,9 +479,43 @@
 .hint--error {
   color: var(--color-brand-aws);
 }
-.card--locked {
-  opacity: 0.45;
-}
 .card--locked .display {
   color: var(--color-text);
+}
+
+/* Name validation */
+.field--invalid {
+  border-color: var(--color-brand-aws);
+}
+.card--locked {
+  opacity: 0.6;
+}
+.card--locked button,
+.card--locked input {
+  cursor: not-allowed;
+}
+.card--shake {
+  animation: shake 0.35s;
+}
+@keyframes shake {
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card--shake {
+    animation: none;
+  }
+}
+.field--invalid:focus-visible {
+  outline-color: var(--color-brand-aws);
 }
