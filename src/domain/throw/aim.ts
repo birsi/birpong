@@ -35,3 +35,19 @@ export function touchdown(origin: Point, landing: Point): Point {
 export function inBounceWindow(power: number): boolean {
   return power >= BOUNCE_WINDOW[0] && power <= BOUNCE_WINDOW[1];
 }
+
+/** An aim from a direction (rad) and power (0 to 1), including where the pull-back handle sits. */
+export function aimFromAngle(origin: Point, angle: number, power: number): Aim {
+  const dir = { x: Math.cos(angle), y: Math.sin(angle) };
+  const pull = power * MAX_PULL;
+  return { dir, power, handle: { x: origin.x - dir.x * pull, y: origin.y - dir.y * pull } };
+}
+
+/** The aim that lands exactly on `point` with no scatter, or null if it is out of range. */
+export function aimAt(origin: Point, point: Point): Aim | null {
+  const dx = point.x - origin.x;
+  const dy = point.y - origin.y;
+  const power = Math.hypot(dx, dy) / MAX_RANGE;
+  if (power > 1) return null;
+  return aimFromAngle(origin, Math.atan2(dy, dx), power);
+}
