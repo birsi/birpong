@@ -2,7 +2,7 @@
 
 Birpong is an online, playable beer pong game for the browser: 2D, bird's-eye view, minimal and slightly retro. It is built in iterations. This file records what has been decided, what the design shows, and what is still open.
 
-Status: iterations 1 to 4 are built (rules engine, table and drag throw, solo CPU on three levels, local stats). Online rooms are next. There are no accounts and none are planned: everything a player has lives in their own browser.
+Status: iterations 1 to 5 are built (rules engine, table and drag throw, solo CPU on three levels, local stats, online rooms). The local leaderboard is next. There are no accounts and none are planned: everything a player has lives in their own browser.
 
 ## Sources
 
@@ -74,7 +74,7 @@ Physical fouls from the source (touching the table, knocking over own cups, spec
 ## Modes
 
 - Solo: one human against a CPU, on three levels (easy, medium, hard).
-- Online: 1 v 1 in a room joined by a 4-character code or invite link. No account needed, only a nickname. The room creator is host. The first throw is decided by rock, paper, scissors, then the rules are the same as in solo. Not built yet.
+- Online: 1 v 1 in a room joined by a 4-character code or an invite link (`?r=CODE`). No account needed, only a nickname. The room creator is host and plays the left end; the guest plays the right end. Both players pick rock, paper, scissors in the lobby; the host presses Start once the first throw is decided. The rules are the same as in solo.
 
 Out of scope: accounts and sign-in, syncing across devices, any server-side storage of stats, a global leaderboard, public matchmaking, local hot-seat, true 2 v 2 with four seats, phone portrait layout.
 
@@ -89,6 +89,20 @@ Each CPU turn the CPU picks a target cup, a shot type and an aim, then throws th
 | Hard   | The cup in the middle of the cluster      | 35% when in the window | 1 cm      | about 0.74                |
 
 The CPU never aims at a cup it has already hit this turn (unless every cup is hit). In simulated matches, easy beat medium about 31% of the time, medium beat hard about 38%, and easy beat hard about 16%. These numbers are placeholders to tune.
+
+### Online rooms
+
+There is no game server. Players find each other with Trystero (public relays are used only to introduce the two browsers) and then talk directly over a WebRTC data channel. The static game can be hosted anywhere; it is deployed on Vercel.
+
+- Authority: both browsers hold the same match state and apply the same rules engine. Only the host rolls throw outcomes (scatter, rim, ricochet), so both players see the same result. A guest sends its aim to the host, the host answers with the outcome, and both play it and apply it. Cheating is not a concern: the host could in principle change outcomes, and that is accepted.
+- Messages: `hello`, `welcome`, `full`, `rps`, `start`, `throw`, `outcome`, `rematch`. Incoming messages are validated and anything malformed is ignored.
+- Room full: a third person who joins gets "That room is full".
+- Finding the room: a guest that hears nothing from the host for 12 seconds is told the room could not be found or reached.
+- Disconnects: if the other player leaves or drops during a match, the match ends without a record and the home screen says so. There is no reconnect.
+- Rematch: after a match both players press Rematch and return to the lobby of the same room (new rock, paper, scissors).
+- Nicknames: two players may have the same nickname.
+- Each browser saves its own record of an online match (mode Online, opponent's nickname).
+- Without a TURN server, some strict networks cannot form a direct connection. Those players cannot join; see the open decisions.
 
 ## Throw input
 
@@ -125,8 +139,8 @@ Records per opponent, computed from the matches saved on the device: matches pla
 
 | File in `docs/design/` | Screen                                                                                       | Status    |
 | ---------------------- | -------------------------------------------------------------------------------------------- | --------- |
-| `home.html`            | Mode select (solo with CPU level, online create or join), nickname, links to stats and rules | Built; online disabled |
-| `lobby.html`           | Online room: code, invite link, two seats, rock-paper-scissors, match rules, time limit      | Not built |
+| `home.html`            | Mode select (solo with CPU level, online create or join), nickname, links to stats and rules | Built |
+| `lobby.html`           | Online room: code, invite link, two seats, rock-paper-scissors, match rules, time limit      | Built; no time limit |
 | `first-throw.html`     | Solo rock-paper-scissors against the CPU                                                     | Built     |
 | `match.html`           | Match, air shot selected: scoreboards, turn card, table, aim line, shot toggle, power, throw log | Built |
 | `match-bounce.html`    | Match, bounce selected: bounce marker, wider landing ring, power window                      | Built     |
@@ -140,6 +154,7 @@ Deviations of the app from the design, because there are no accounts:
 
 - No "Sign in" button on the home or stats screens, and the copy no longer mentions syncing or signing in.
 - The "Leaderboard" tab on the stats screen becomes local records per opponent.
+- The lobby has no time-limit buttons, because the time limit is off. The invite link uses the site's own address instead of `[YOUR-DOMAIN]`.
 
 ### Table geometry used in the design
 
@@ -169,7 +184,7 @@ The rules engine is a pure, deterministic state machine: `(state, action) -> sta
 - Code is layered with one-way dependencies: `domain` (engine, throw model, CPU, stats; no DOM) <- `game` (Phaser table scene) and `ui` (DOM components) <- `match` (controller, narration, view models) <- `app` (screens, navigation) <- `main`. `storage` holds the local stores.
 - Stats are derived from the engine's throw log by pure functions, so any client can build a match record from a finished game.
 - Storage is local only and sits behind interfaces (`StatsStore`, `ProfileStore`).
-- Online play needs exactly one authority that runs the engine and rolls the seeded throw outcomes, so both players see the same match. Who that is (a server or the host) is open, see below.
+- Online play needs exactly one authority that rolls the throw outcomes, so both players see the same match. That is the host's browser; the rules engine itself runs identically on both sides. Where throw outcomes come from is hidden behind a match driver (solo CPU or online session), so the match controller is the same for both.
 - The engine and throw model are unit-tested against the rules in this file.
 
 ## Iteration order
@@ -178,7 +193,7 @@ The rules engine is a pure, deterministic state machine: `(state, action) -> sta
 2. Table rendering and the drag throw. Done.
 3. CPU opponent, three levels. Done.
 4. Local stats. Done.
-5. Online rooms.
+5. Online rooms. Done.
 6. Local leaderboard (records per opponent).
 
 ## Decided
@@ -187,6 +202,8 @@ The rules engine is a pure, deterministic state machine: `(state, action) -> sta
 - Throw model v1: seeded scatter, cup core and rim, ricochet, rack exit (values to tune).
 - Rules questions closed: re-rack timing, the re-roll that also clears the rack (sudden death), second cup after a bounce hit (automatic).
 - No accounts; stats and the leaderboard stay in the browser.
+- Online transport: Trystero (WebRTC, public relays for matchmaking), host rolls outcomes, no game server. Hosting: static build on Vercel.
+- Online edge cases: a disconnect ends the match without a record, rematch returns to the lobby, duplicate nicknames are allowed.
 
 ## Open decisions
 
@@ -198,13 +215,15 @@ Rules:
 
 Technical:
 
-- Realtime transport and hosting for online rooms. Decide in iteration 5. Requirements: 1 v 1, joined by code or link, no accounts, one authority for the engine and seeded outcomes, cheap to host.
-- Online edge cases: what happens when a player disconnects (wait, forfeit, reconnect), rematch inside a room, two players with the same nickname.
+- TURN fallback: without a TURN server, some strict networks cannot connect directly. Decide whether to add a TURN service, and whether the relays Trystero uses are reliable enough.
+- Reconnect: whether a player who drops can come back to a running match, instead of ending it.
+- Throw preview online: showing the opponent's aim while they drag, as the CPU's aim is shown.
 - Tuning: bounce difficulty, rim odds and the CPU levels, once real players have tried them.
 - Local data: whether to offer export, import or reset of the saved stats.
 
 ## Verification
 
-- `npm run check` (typecheck, lint, tests): engine rules including the project decisions, throw model, CPU, stats, storage and view-model tests.
+- `npm run check` (typecheck, lint, tests): engine rules including the project decisions, throw model, CPU, stats, storage, view-model and online (protocol, session, drivers over an in-memory link) tests.
 - CPU strength: simulate full matches between the levels and check easy < medium < hard.
+- Online: two headless browsers, one creates a room and the other joins by code or invite link; play a match from both sides, check both result screens and records, rematch and leaving.
 - UI: run the app in a headless browser, play a solo match to the end, check the result and stats screens and a reload; screenshot at 1280 px width and compare against `docs/design/screens/`.

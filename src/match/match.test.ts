@@ -51,11 +51,11 @@ describe("narration", () => {
 describe("view models", () => {
   it("counts standing, hit and removed cups as dots", () => {
     const s = play(started(), air(0));
-    const defender = scoreView(s, 1, "CPU");
+    const defender = scoreView(s, 1, "CPU", "CPU", false);
     expect(defender.standing).toBe(10);
     expect(defender.dots.filter((d) => d === "hit")).toHaveLength(1);
     expect(defender.dots.filter((d) => d === "standing")).toHaveLength(9);
-    expect(scoreView(s, 0, "you").dots.every((d) => d === "standing")).toBe(true);
+    expect(scoreView(s, 0, "you", "YOU", true).dots.every((d) => d === "standing")).toBe(true);
   });
   it("shows the state of both balls in the current round", () => {
     const s = play(started(), air(0));

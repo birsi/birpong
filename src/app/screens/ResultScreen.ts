@@ -1,10 +1,8 @@
 import Phaser from "phaser";
-import type { CpuLevel } from "../../domain/cpu";
-import type { State } from "../../domain/engine";
+import type { Side, State } from "../../domain/engine";
 import type { MatchRecord } from "../../domain/stats";
 import { createGame } from "../../game/createGame";
 import { TableScene } from "../../game/TableScene";
-import { levelLabel } from "../../match/narration";
 import { button, el } from "../../ui/dom";
 import { resultView } from "../screenModels";
 import type { Navigator, Screen } from "../types";
@@ -14,7 +12,14 @@ export interface ResultData {
   /** The final state, drawn as the table. */
   state: State;
   nickname: string;
-  level: CpuLevel;
+  /** The opponent's column header. */
+  opponentLabel: string;
+  /** Header chip, e.g. "Solo · CPU easy". */
+  modeLabel: string;
+  localSide: Side;
+  /** Online: a rematch needs the other player to agree, so the button waits. */
+  online: boolean;
+  onRematch: () => void;
 }
 
 /** Who won, the final table, and how each side did. */
@@ -30,10 +35,7 @@ export class ResultScreen implements Screen {
     const page = el("div", "page");
 
     const header = el("header", "topbar");
-    header.append(
-      el("span", "wordmark", "BIRPONG"),
-      el("span", "chip", `Solo · CPU ${data.level}`),
-    );
+    header.append(el("span", "wordmark", "BIRPONG"), el("span", "chip", data.modeLabel));
 
     const headline = el("div", "headline");
     headline.append(
@@ -51,13 +53,13 @@ export class ResultScreen implements Screen {
       state: data.state,
       shot: "air",
       canThrow: false,
-      names: ["You", "CPU"],
+      names: data.localSide === 0 ? ["You", data.opponentLabel] : [data.opponentLabel, "You"],
     });
     page.append(
       header,
       headline,
       arena,
-      this.table(view, data.nickname, levelLabel(data.level)),
+      this.table(view, data.nickname, data.opponentLabel),
       this.actions(data),
     );
     root.replaceChildren(page);
@@ -71,11 +73,7 @@ export class ResultScreen implements Screen {
   private table(view: ReturnType<typeof resultView>, nickname: string, opponent: string) {
     const table = el("table", "table table--result");
     const head = el("tr");
-    head.append(
-      el("th", undefined, "Match"),
-      el("th", "num", nickname),
-      el("th", "num", `CPU ${opponent}`),
-    );
+    head.append(el("th", undefined, "Match"), el("th", "num", nickname), el("th", "num", opponent));
     const thead = el("thead");
     thead.append(head);
     table.append(thead);
@@ -89,6 +87,17 @@ export class ResultScreen implements Screen {
     return table;
   }
 
+  private rematchButton(data: ResultData): HTMLButtonElement {
+    const rematch = button("btn btn--primary", "REMATCH", () => {
+      data.onRematch();
+      if (data.online) {
+        rematch.disabled = true;
+        rematch.textContent = "WAITING FOR THE OTHER PLAYER…";
+      }
+    });
+    return rematch;
+  }
+
   private actions(data: ResultData): HTMLElement {
     const row = el("div", "topbar");
     row.append(el("span", "muted", "Saved to your stats on this device."));
@@ -96,7 +105,7 @@ export class ResultScreen implements Screen {
     buttons.append(
       button("btn", "Home", () => this.nav.home()),
       button("btn", "Stats", () => this.nav.stats()),
-      button("btn btn--primary", "REMATCH", () => this.nav.firstThrow(data.level)),
+      this.rematchButton(data),
     );
     row.append(buttons);
     return row;

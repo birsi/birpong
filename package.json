@@ -25,6 +25,7 @@
     "vitest": "^5.0.3"
   },
   "dependencies": {
-    "phaser": "^4.2.1"
+    "phaser": "^4.2.1",
+    "trystero": "^0.26.0"
   }
 }

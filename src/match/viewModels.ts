@@ -10,19 +10,27 @@ export interface ScoreView {
   side: Side;
   name: string;
   tag: string;
+  /** The side the person at this screen plays. */
+  mine: boolean;
   standing: number;
   /** Always CUPS_PER_SIDE dots: standing cups, then cups hit this turn, then removed cups. */
   dots: DotKind[];
 }
 
-export function scoreView(state: State, side: Side, name: string): ScoreView {
+export function scoreView(
+  state: State,
+  side: Side,
+  name: string,
+  tag: string,
+  mine: boolean,
+): ScoreView {
   const standing = state.cups[side].length;
   // Cups hit by the thrower this turn are still on the table until the turn ends.
   const hits = side === state.thrower ? 0 : state.pending.length;
   const dots: DotKind[] = Array.from({ length: CUPS_PER_SIDE }, (_, i) =>
     i < standing - hits ? "standing" : i < standing ? "hit" : "gone",
   );
-  return { side, name, tag: side === 0 ? "YOU" : "CPU", standing, dots };
+  return { side, name, tag, mine, standing, dots };
 }
 
 export type BallKind = "hit" | "miss" | "now" | "waiting";

@@ -1,5 +1,6 @@
 import { CPU_LEVELS, type CpuLevel } from "../../domain/cpu";
 import { levelLabel } from "../../match/narration";
+import { isRoomCode, normalizeRoomCode } from "../../online/roomCode";
 import type { ProfileStore } from "../../storage/ProfileStore";
 import { MAX_NICKNAME } from "../../storage/ProfileStore";
 import { RULES_URL } from "../../ui/components/MatchPage";
@@ -18,8 +19,14 @@ export class HomeScreen implements Screen {
     root: HTMLElement,
     private readonly nav: Navigator,
     private readonly profile: ProfileStore,
+    notice?: string,
   ) {
     const page = el("div", "page");
+    if (notice) {
+      const banner = el("p", "notice", notice);
+      banner.setAttribute("role", "status");
+      page.append(banner);
+    }
     page.append(
       el("h1", "display display--hero", "BIRPONG"),
       createTableHero(),
@@ -65,23 +72,33 @@ export class HomeScreen implements Screen {
   }
 
   private onlineCard(): HTMLElement {
-    const card = el("section", "card card--mode card--soon");
-    const code = el("input", "field");
+    const card = el("section", "card card--mode");
+    const code = el("input", "field field--code");
     code.placeholder = "K7QM";
-    code.disabled = true;
+    code.maxLength = 8;
+    code.autocomplete = "off";
     code.ariaLabel = "Room code";
     const join = el("button", "btn", "JOIN");
     join.disabled = true;
-    const create = el("button", "btn btn--primary btn--block", "CREATE ROOM");
-    create.disabled = true;
+    const submit = () => {
+      if (isRoomCode(code.value)) this.nav.joinRoom(code.value);
+    };
+    code.addEventListener("input", () => {
+      code.value = normalizeRoomCode(code.value);
+      join.disabled = !isRoomCode(code.value);
+    });
+    code.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submit();
+    });
+    join.addEventListener("click", submit);
     const joinRow = el("div", "inline");
     joinRow.append(code, join);
     card.append(
       el("h2", "display", "ONLINE"),
-      el("p", "muted", "One on one. Share a room code, no account needed. Coming soon."),
+      el("p", "muted", "One on one. Share a room code, no account needed."),
       el("span", "label", "Room code"),
       joinRow,
-      create,
+      button("btn btn--primary btn--block", "CREATE ROOM", () => this.nav.createRoom()),
     );
     return card;
   }

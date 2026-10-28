@@ -9,7 +9,7 @@ Throw by dragging back from the ball and letting go: direction sets the aim, pul
 ## Features (planned)
 
 - **Solo** against a CPU on easy, medium or hard.
-- **Online** 1 v 1 in a room joined by a 4-character code or invite link. No account needed.
+- **Online** 1 v 1 in a room joined by a 4-character code or invite link. No account needed, no game server: players connect directly with WebRTC.
 - **Guest stats** stored on your device: hit rate, streaks, balls back, hits per rack position, recent matches.
 - **Records per opponent** as a local leaderboard.
 - No accounts: you are a guest with a nickname, and nothing is stored on a server.
@@ -40,7 +40,7 @@ npm run build          # production bundle
 
 ## Stack
 
-TypeScript, Vite, Vitest. The table scene runs on [Phaser 4](https://phaser.io); the rules engine and throw model run without a browser (the throw model only uses Phaser's seeded `RandomDataGenerator`).
+TypeScript, Vite, Vitest. The table scene runs on [Phaser 4](https://phaser.io); online rooms use [Trystero](https://github.com/dmotz/trystero) (WebRTC); the rules engine and throw model run without a browser (the throw model only uses Phaser's seeded `RandomDataGenerator`).
 
 ## Project layout
 
@@ -55,9 +55,10 @@ src/
     cpu/             CPU opponent: target, shot and aim per level
     stats/           per-match summary and totals
   storage/           localStorage stores (matches, nickname) behind interfaces
-  app/               screen manager and screens (home, first throw, result, stats)
+  online/            room protocol, Trystero link, OnlineSession (no DOM)
+  app/               screen manager and screens (home, first throw, lobby, result, stats)
   game/              Phaser: TableScene composes parts/ (backdrop, cups, aim, ball flight, drag)
-  match/             MatchController wires domain, game and UI; narration and view models are pure
+  match/             MatchController wires domain, game and UI; drivers supply throw outcomes (CPU or online)
   ui/                DOM components and styles
 ```
 
@@ -66,13 +67,17 @@ The engine is a deterministic state machine that knows nothing about rendering o
 solo, online and stats will all run on it. Throw outcomes come from a seeded model in
 `domain/throw`, not from simulated physics, so the same seed always replays the same match.
 
+## Deploy
+
+The game is a static Vite build, so it deploys to Vercel as is: import the repository in Vercel (build command `npm run build`, output `dist`, both detected automatically and set in `vercel.json`) or run `vercel` from the project folder. Online rooms need no environment variables or backend; the site only has to be served over HTTPS, which Vercel does. Invite links use the site's own address.
+
 ## Roadmap
 
 1. Rules engine with tests (done)
 2. Table rendering and the drag throw (done, on Phaser 4)
 3. CPU opponent, three levels (done)
 4. Local stats (done)
-5. Online rooms
+5. Online rooms (done)
 6. Local leaderboard (records per opponent)
 
 ## License

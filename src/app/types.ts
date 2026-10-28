@@ -8,8 +8,13 @@ export interface Screen {
 
 /** Where a screen can send the player. Implemented by `App`. */
 export interface Navigator {
-  home(): void;
+  /** The start screen, optionally with a message (e.g. why a room ended). */
+  home(notice?: string): void;
   firstThrow(level: CpuLevel): void;
   match(level: CpuLevel, first: Side): void;
   stats(): void;
+  createRoom(): void;
+  joinRoom(code: string): void;
+  /** Both players are in the lobby and the first throw is decided: begin the online match. */
+  startOnline(first: Side): void;
 }

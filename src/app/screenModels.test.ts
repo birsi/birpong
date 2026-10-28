@@ -70,4 +70,9 @@ describe("statsView", () => {
     });
     expect(v.recent[0]?.date).toMatch(/Oct/);
   });
+
+  it("labels online matches", () => {
+    const v = statsView(aggregate([record({ mode: "online", opponent: "flo" })]));
+    expect(v.recent[0]).toMatchObject({ mode: "Online", opponent: "flo" });
+  });
 });

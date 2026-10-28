@@ -388,3 +388,73 @@
 .btn {
   white-space: nowrap;
 }
+
+/* Online */
+.notice {
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--color-brand-aws);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text-strong);
+}
+.field--code {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-weight: 700;
+}
+.card--code {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 24px;
+  flex: none;
+}
+@media (max-width: 720px) {
+  .card--code {
+    grid-template-columns: 1fr;
+  }
+}
+.display--code {
+  font-size: clamp(48px, 10vw, 88px);
+  letter-spacing: 0.2em;
+}
+.link {
+  word-break: break-all;
+}
+.seat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  flex: none;
+}
+.seat__state {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-text-strong);
+}
+.rules {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 20px;
+  margin: 0;
+  font-size: 13px;
+}
+.rules dt {
+  color: var(--color-text);
+}
+.rules dd {
+  margin: 0;
+  color: var(--color-text-strong);
+}
+.pick:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.page > .btn--block {
+  flex: none;
+}

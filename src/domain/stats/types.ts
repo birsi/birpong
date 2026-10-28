@@ -18,8 +18,8 @@ export interface MatchRecord {
   id: string;
   /** ISO date and time the match ended. */
   date: string;
-  mode: "solo";
-  /** Display name of the opponent, e.g. "CPU medium". */
+  mode: "solo" | "online";
+  /** Display name of the opponent: "CPU medium" or the online opponent's nickname. */
   opponent: string;
   result: "win" | "loss";
   you: SideSummary;

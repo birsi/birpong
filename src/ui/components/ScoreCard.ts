@@ -13,7 +13,7 @@ export class ScoreCard {
     const mirrored = view.side === 1;
 
     const who = el("div", "who");
-    const tag = el("span", mirrored ? "tag tag--b" : "tag", view.tag);
+    const tag = el("span", view.mine ? "tag" : "tag tag--b", view.tag);
     const name = el("span", "who__name", view.name);
     who.append(...(mirrored ? [name, tag] : [tag, name]));
 

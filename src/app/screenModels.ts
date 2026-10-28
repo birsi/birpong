@@ -113,7 +113,7 @@ export function statsView(totals: Totals): StatsView {
     recent: totals.recent.map((r) => ({
       date: formatDate(r.date),
       opponent: r.opponent,
-      mode: "Solo",
+      mode: r.mode === "online" ? "Online" : "Solo",
       result: r.result === "win" ? "W" : "L",
       cups: `${r.you.cupsSunk} : ${r.opp.cupsSunk}`,
       hitRate: percent(r.you.hits, r.you.throws),
