@@ -1,5 +1,5 @@
 import { CUPS_PER_SIDE, slotPosition } from "../domain/engine";
-import type { MatchRecord, SideSummary, Totals } from "../domain/stats";
+import type { MatchRecord, OpponentRecord, SideSummary, Totals } from "../domain/stats";
 
 const percent = (part: number, whole: number): string =>
   whole ? `${Math.round((part / whole) * 100)}%` : "–";
@@ -119,4 +119,31 @@ export function statsView(totals: Totals): StatsView {
       hitRate: percent(r.you.hits, r.you.throws),
     })),
   };
+}
+
+// --- Records (local leaderboard) ---------------------------------------
+
+export interface RecordsRow {
+  opponent: string;
+  mode: string;
+  played: number;
+  won: number;
+  lost: number;
+  winRate: string;
+  /** 0 to 1, for the bar. */
+  winShare: number;
+  lastPlayed: string;
+}
+
+export function recordsView(rows: readonly OpponentRecord[]): RecordsRow[] {
+  return rows.map((r) => ({
+    opponent: r.opponent,
+    mode: r.mode === "online" ? "Online" : "Solo",
+    played: r.played,
+    won: r.won,
+    lost: r.lost,
+    winRate: `${Math.round(r.winRate * 100)}%`,
+    winShare: r.winRate,
+    lastPlayed: formatDate(r.lastPlayed),
+  }));
 }

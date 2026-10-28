@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { aggregate, type MatchRecord } from "../domain/stats";
-import { resultView, statsView } from "./screenModels";
+import { recordsView, resultView, statsView } from "./screenModels";
+import { recordsByOpponent } from "../domain/stats";
 
 const record = (over: Partial<MatchRecord> = {}): MatchRecord => {
   const rackHits = Array.from({ length: 10 }, () => 0);
@@ -74,5 +75,28 @@ describe("statsView", () => {
   it("labels online matches", () => {
     const v = statsView(aggregate([record({ mode: "online", opponent: "flo" })]));
     expect(v.recent[0]).toMatchObject({ mode: "Online", opponent: "flo" });
+  });
+});
+
+describe("recordsView", () => {
+  it("formats rows with mode, win rate and last played", () => {
+    const rows = recordsView(
+      recordsByOpponent([
+        record({ id: "a", opponent: "CPU hard", result: "win" }),
+        record({ id: "b", opponent: "CPU hard", result: "loss", date: "2026-10-05T10:00:00.000Z" }),
+        record({ id: "c", mode: "online", opponent: "flo", result: "win" }),
+      ]),
+    );
+    expect(rows[0]).toMatchObject({
+      opponent: "CPU hard",
+      mode: "Solo",
+      played: 2,
+      won: 1,
+      lost: 1,
+      winRate: "50%",
+      winShare: 0.5,
+    });
+    expect(rows[0]!.lastPlayed).toMatch(/Oct/);
+    expect(rows[1]).toMatchObject({ opponent: "flo", mode: "Online", winRate: "100%" });
   });
 });
