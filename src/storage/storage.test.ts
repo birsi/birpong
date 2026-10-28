@@ -2,30 +2,54 @@ import { describe, expect, it } from "vitest";
 import type { MatchRecord } from "../domain/stats";
 import { FakeStorage } from "./FakeStorage";
 import { LocalStatsStore, MAX_RECORDS, MemoryStatsStore } from "./StatsStore";
-import { DEFAULT_NICKNAME, LocalProfileStore, MAX_NICKNAME } from "./ProfileStore";
+import { checkNickname, LocalProfileStore, MAX_NICKNAME } from "./ProfileStore";
+
+describe("checkNickname", () => {
+  it("accepts a real name and tidies it", () => {
+    expect(checkNickname("  birsi  ")).toEqual({ ok: true, name: "birsi" });
+    expect(checkNickname("anna   marie")).toEqual({ ok: true, name: "anna marie" });
+  });
+  it("rejects too short and too long names", () => {
+    expect(checkNickname("a").ok).toBe(false);
+    expect(checkNickname("   ").ok).toBe(false);
+    expect(checkNickname("x".repeat(MAX_NICKNAME + 1)).ok).toBe(false);
+    expect(checkNickname("x".repeat(MAX_NICKNAME)).ok).toBe(true);
+  });
+  it("rejects placeholder names in any case", () => {
+    for (const name of ["guest", "GUEST", "Guest ", "you", "CPU", "player", "Opponent"]) {
+      expect(checkNickname(name).ok).toBe(false);
+    }
+    expect(checkNickname("guesty").ok).toBe(true);
+  });
+});
 
 describe("LocalProfileStore", () => {
-  it("defaults to guest and remembers a nickname", () => {
+  it("has no name until one is chosen, then remembers it", () => {
     const storage = new FakeStorage();
     const store = new LocalProfileStore(storage);
-    expect(store.nickname()).toBe(DEFAULT_NICKNAME);
-    store.setNickname("  birsi ");
+    expect(store.nickname()).toBeNull();
+    expect(store.setNickname("  birsi ")).toEqual({ ok: true, name: "birsi" });
     expect(new LocalProfileStore(storage).nickname()).toBe("birsi");
   });
-  it("trims long and empty nicknames", () => {
+  it("does not save an invalid name and keeps the old one", () => {
     const store = new LocalProfileStore(new FakeStorage());
-    store.setNickname("x".repeat(40));
-    expect(store.nickname()).toHaveLength(MAX_NICKNAME);
-    store.setNickname("   ");
-    expect(store.nickname()).toBe(DEFAULT_NICKNAME);
+    store.setNickname("birsi");
+    expect(store.setNickname("guest").ok).toBe(false);
+    expect(store.setNickname("x").ok).toBe(false);
+    expect(store.nickname()).toBe("birsi");
+  });
+  it("ignores a saved placeholder name from an older version", () => {
+    const storage = new FakeStorage();
+    storage.setItem("birpong.profile", JSON.stringify({ nickname: "guest" }));
+    expect(new LocalProfileStore(storage).nickname()).toBeNull();
   });
   it("survives corrupt data and missing storage", () => {
     const storage = new FakeStorage();
     storage.setItem("birpong.profile", "{not json");
-    expect(new LocalProfileStore(storage).nickname()).toBe(DEFAULT_NICKNAME);
+    expect(new LocalProfileStore(storage).nickname()).toBeNull();
     const none = new LocalProfileStore(null);
-    none.setNickname("a");
-    expect(none.nickname()).toBe(DEFAULT_NICKNAME);
+    expect(none.setNickname("anna").ok).toBe(true);
+    expect(none.nickname()).toBeNull();
   });
 });
 

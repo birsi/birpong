@@ -20,7 +20,7 @@ export class StatsScreen implements Screen {
 
     const who = el("div", "inline");
     who.append(
-      el("h1", "display display--big", profile.nickname().toUpperCase()),
+      el("h1", "display display--big", (profile.nickname() ?? "Your stats").toUpperCase()),
       el("span", "tag tag--guest", "GUEST"),
     );
     const note = el("p", "muted", "Stats are saved on this device only.");

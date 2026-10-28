@@ -64,7 +64,7 @@ Where a ball lands decides what it does. Distances are measured from the cup cen
 | Solo first throw              | Rock, paper, scissors against the CPU, same as online.                                            |
 | Team size                     | 1 v 1; the one player throws both balls. The source rules are 2 v 2.                              |
 | Time limit                    | Off. The source gives no duration; the lobby design shows Off, 10 min, 15 min as a placeholder.   |
-| Accounts                      | None. Players are guests with a nickname.                                                         |
+| Accounts                      | None. Players have a nickname, which they must choose before playing (no anonymous guests).        |
 | Stats and leaderboard         | Stored only in the player's own browser. Nothing is stored on a server.                           |
 
 ### Not applicable in a digital game
@@ -123,7 +123,8 @@ All values are placeholders in `src/domain/throw/constants.ts`, not tuned. One f
 
 ## Stats
 
-- Guest only: a player picks a nickname (kept in the browser) and plays immediately. There is no sign-in.
+- No sign-in, but a name is required: the home screen asks "Who are you?" first, and solo, online and creating or joining a room stay locked until a valid name is saved. There is no default name, so nobody plays as an anonymous guest. A name has 2 to 16 characters and may not be a placeholder (guest, you, cpu, player, opponent). The name is kept in the browser.
+- An invite link opened without a name lands on the home screen with the room waiting; once a name is set the player joins with one click.
 - Everything is stored in the browser (`localStorage`) behind a small store interface. Clearing browser data clears the stats. There is no sync between devices.
 - Every finished match is saved on the device: solo matches and, once online rooms exist, online matches. In an online match each player's browser builds the record from the final throw log and saves it itself, with mode Online and the opponent's nickname.
 

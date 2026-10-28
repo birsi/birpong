@@ -3,7 +3,6 @@ import { beats, initialState, reduce, type Rps, type Side } from "../../domain/e
 import { createRng } from "../../domain/throw";
 import { levelLabel } from "../../match/narration";
 import { button, el } from "../../ui/dom";
-import type { ProfileStore } from "../../storage/ProfileStore";
 import type { Navigator, Screen } from "../types";
 
 const CHOICES: Rps[] = ["rock", "paper", "scissors"];
@@ -20,7 +19,7 @@ export class FirstThrowScreen implements Screen {
     root: HTMLElement,
     private readonly nav: Navigator,
     private readonly level: CpuLevel,
-    private readonly profile: ProfileStore,
+    nickname: string,
   ) {
     const page = el("div", "page");
     const header = el("header", "topbar");
@@ -33,7 +32,7 @@ export class FirstThrowScreen implements Screen {
 
     const you = el("section", "card");
     const youHead = el("div", "who");
-    youHead.append(el("span", "tag", "YOU"), el("span", "who__name", profile.nickname()));
+    youHead.append(el("span", "tag", "YOU"), el("span", "who__name", nickname));
     const picks = el("div", "picks");
     for (const choice of CHOICES) {
       const b = button("pick", choice.toUpperCase(), () => this.play(choice));

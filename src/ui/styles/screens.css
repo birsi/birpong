@@ -79,14 +79,6 @@
 .card--soon {
   opacity: 0.6;
 }
-.card--profile {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 24px;
-}
 .hero__table {
   display: block;
   width: 100%;
@@ -171,9 +163,6 @@
   font: inherit;
   flex: 1;
   min-width: 0;
-}
-.field--name {
-  flex: 0 1 200px;
 }
 .card--mode .inline .field {
   flex: 1;
@@ -457,4 +446,42 @@
 }
 .page > .btn--block {
   flex: none;
+}
+
+/* Name card */
+.card--profile {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+}
+.card--needed {
+  border-color: var(--color-accent);
+}
+.stack--grow {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+.field--name {
+  flex: none;
+  width: 100%;
+  max-width: 320px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text);
+}
+.hint--error {
+  color: var(--color-brand-aws);
+}
+.card--locked {
+  opacity: 0.45;
+}
+.card--locked .display {
+  color: var(--color-text);
 }

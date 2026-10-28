@@ -9,7 +9,7 @@ import { generateRoomCode } from "../online/roomCode";
 import { LocalProfileStore, type ProfileStore } from "../storage/ProfileStore";
 import { LocalStatsStore, type StatsStore } from "../storage/StatsStore";
 import { FirstThrowScreen } from "./screens/FirstThrowScreen";
-import { HomeScreen } from "./screens/HomeScreen";
+import { HomeScreen, type HomeOptions } from "./screens/HomeScreen";
 import { LobbyScreen } from "./screens/LobbyScreen";
 import { ResultScreen } from "./screens/ResultScreen";
 import { StatsScreen } from "./screens/StatsScreen";
@@ -37,17 +37,24 @@ export class App implements Navigator {
   }
 
   home(notice?: string): void {
+    this.showHome({ notice });
+  }
+
+  private showHome(options: HomeOptions): void {
     this.leaveRoom();
-    this.show(() => new HomeScreen(this.root, this, this.profile, notice));
+    this.show(() => new HomeScreen(this.root, this, this.profile, options));
   }
 
   firstThrow(level: CpuLevel): void {
-    this.show(() => new FirstThrowScreen(this.root, this, level, this.profile));
+    const name = this.profile.nickname();
+    if (!name) return this.home();
+    this.show(() => new FirstThrowScreen(this.root, this, level, name));
   }
 
   match(level: CpuLevel, first: Side): void {
-    const driver = new SoloDriver(this.profile.nickname(), level, Date.now());
-    this.playMatch(first, driver, () => this.firstThrow(level));
+    const name = this.profile.nickname();
+    if (!name) return this.home();
+    this.playMatch(first, new SoloDriver(name, level, Date.now()), () => this.firstThrow(level));
   }
 
   stats(): void {
@@ -60,20 +67,24 @@ export class App implements Navigator {
     this.openRoom(generateRoomCode(), "host");
   }
 
+  /** Join a room. Without a name the player first lands on the home screen with the invite waiting. */
   joinRoom(code: string): void {
+    if (!this.profile.nickname()) return this.showHome({ invite: code });
     this.openRoom(code, "guest");
   }
 
   startOnline(first: Side): void {
     const room = this.room;
     if (!room) return;
-    const driver = new OnlineDriver(room.session, this.profile.nickname());
+    const driver = new OnlineDriver(room.session, room.session.nickname);
     this.playMatch(first, driver, () => this.requestRematch(room));
   }
 
   private openRoom(code: string, role: "host" | "guest"): void {
+    const name = this.profile.nickname();
+    if (!name) return this.home();
     this.leaveRoom();
-    const session = new OnlineSession(joinTrysteroRoom(code), role, this.profile.nickname());
+    const session = new OnlineSession(joinTrysteroRoom(code), role, name);
     this.room = { session, code };
     this.showLobby(this.room);
   }
