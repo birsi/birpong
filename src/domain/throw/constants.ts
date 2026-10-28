@@ -5,8 +5,8 @@ import type { Shot, Side } from "../engine";
 
 /** Where each player's ball rests, behind their own end of the table. */
 export const BALL_START: Record<Side, Point> = {
-  0: { x: -13, y: 38 },
-  1: { x: 253, y: 38 },
+  0: { x: -13, y: 30 },
+  1: { x: 253, y: 30 },
 };
 
 // --- Aim and power
