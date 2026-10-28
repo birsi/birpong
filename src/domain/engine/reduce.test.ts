@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { makeRack, reRack, slotPosition } from "./rack";
-import { initialState, reduce } from "./reduce";
+import { reduce } from "./reduce";
+import { initialState } from "./state";
 import type { Action, State } from "./types";
 
 const play = (s: State, ...a: Action[]) => a.reduce(reduce, s);
@@ -86,13 +87,13 @@ describe("ending", () => {
     let s = started();
     s = { ...s, first: 1, thrower: 0 };
     s = withCups(s, 1, 1);
-    s = play(s, air(0), air(null));
+    s = play(s, air(0));
     expect(s.phase).toBe("over");
     expect(s.winner).toBe(0);
   });
   it("gives the other side one last turn after the first side clears", () => {
     let s = withCups(started(), 1, 1);
-    s = play(s, air(0), air(null));
+    s = play(s, air(0));
     expect(s.phase).toBe("reroll");
     expect(s.thrower).toBe(1);
     const e = play(s, air(null), air(null));
@@ -101,14 +102,14 @@ describe("ending", () => {
   });
   it("re-roll does not give balls back", () => {
     let s = withCups(started(), 1, 1);
-    s = play(s, air(0), air(null));
+    s = play(s, air(0));
     s = withCups(s, 0, 5);
     const e = play(s, air(0), air(1));
     expect(e.phase).toBe("over");
   });
   it("goes to sudden death when the re-roll clears the rack", () => {
     let s = withCups(started(), 1, 1);
-    s = play(s, air(0), air(null));
+    s = play(s, air(0));
     s = withCups(s, 0, 2);
     s = play(s, air(0), air(1));
     expect(s.phase).toBe("throwing");
@@ -118,7 +119,7 @@ describe("ending", () => {
   });
   it("sudden death: equal turns, then the side with more cups wins", () => {
     let s = withCups(started(), 1, 1);
-    s = play(s, air(0), air(null));
+    s = play(s, air(0));
     s = withCups(s, 0, 2);
     s = play(s, air(0), air(1)); // sudden death starts, side 0 throws
     s = play(s, air(0), air(null)); // side 0 removes one of side 1's cups
@@ -129,8 +130,38 @@ describe("ending", () => {
   });
   it("rejects throws after the game is over", () => {
     let s = withCups(started(), 1, 1);
-    s = play(s, air(0), air(null));
+    s = play(s, air(0));
     s = play(s, air(null), air(null));
+    expect(s.phase).toBe("over");
     expect(() => reduce(s, air(null))).toThrow();
+  });
+
+  it("ends the turn at once when the last cups are already hit, with no second ball", () => {
+    // One bounce hit takes both remaining cups: nothing is left to throw at.
+    let s = withCups(started(), 1, 2);
+    s = play(s, bounce(0));
+    expect(s.phase).toBe("reroll"); // the first thrower cleared the rack: last chance for the other side
+    expect(s.thrower).toBe(1);
+    expect(s.cups[1]).toHaveLength(0);
+    expect(s.log).toHaveLength(1);
+  });
+  it("gives no balls back when both balls hit and that clears the rack", () => {
+    let s = withCups(started(), 1, 2);
+    s = play(s, air(0), air(1));
+    expect(s.ballsBackUsed).toBe(false);
+    expect(s.phase).toBe("reroll");
+    expect(s.thrower).toBe(1);
+  });
+  it("lets the second side win on the spot when it clears the rack", () => {
+    let s: State = { ...withCups(started(), 1, 2), first: 1 };
+    s = play(s, bounce(0));
+    expect(s.phase).toBe("over");
+    expect(s.winner).toBe(0);
+  });
+  it("still throws the second ball while an unhit cup is left", () => {
+    let s = withCups(started(), 1, 3);
+    s = play(s, air(0));
+    expect(s.thrower).toBe(0);
+    expect(s.ballsThrown).toBe(1);
   });
 });

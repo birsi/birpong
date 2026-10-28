@@ -9,9 +9,10 @@ Throw by dragging back from the ball and letting go: direction sets the aim, pul
 ## Features (planned)
 
 - **Solo** against a CPU on easy, medium or hard.
-- **Online** 1 v 1 in a room joined by a 4-character code or invite link. No account needed.
-- **Guest stats** stored on your device: hit rate, streaks, balls back, hits per rack position.
-- Optional sign-in to sync stats and appear on a leaderboard.
+- **Online** 1 v 1 in a room joined by a 4-character code or invite link. No account needed, no game server: players connect directly with WebRTC.
+- **Guest stats** stored on your device: hit rate, streaks, balls back, hits per rack position, recent matches.
+- **Records per opponent** as a local leaderboard.
+- No accounts: you choose a name before you play, and nothing is stored on a server.
 
 ## Rules
 
@@ -30,32 +31,54 @@ Requires Node.js 20 or newer.
 
 ```sh
 npm install
-npm test          # run the engine tests
-npm run typecheck
+npm run dev            # play against the CPU in the browser
+npm run check          # typecheck + lint + tests
+npm test               # tests only
+npm run format         # Prettier
+npm run build          # production bundle
 ```
 
-`npm run dev` and `npm run build` are wired up but there is no app to show yet.
+## Stack
+
+TypeScript, Vite, Vitest. The table scene runs on [Phaser 4](https://phaser.io); online rooms use [Trystero](https://github.com/dmotz/trystero) (WebRTC); the rules engine and throw model run without a browser (the throw model only uses Phaser's seeded `RandomDataGenerator`).
 
 ## Project layout
 
 ```
 docs/
-  SPEC.md          rules, modes, screens, open decisions
-  design/          static HTML screens, PNG renders, colour tokens
+  SPEC.md            rules, modes, screens, open decisions
+  design/            static HTML screens, PNG renders, colour tokens
 src/
-  engine/          pure rules state machine and tests
+  domain/            pure game logic: no DOM, no Phaser scene
+    engine/          rules state machine (rps, throw, turn, sudden death) and tests
+    throw/           aim, scatter, cup rim and ricochet model, seeded RNG, tuning constants
+    cpu/             CPU opponent: target, shot and aim per level
+    stats/           per-match summary and totals
+  storage/           localStorage stores (matches, nickname) behind interfaces
+  online/            room protocol, Trystero link, OnlineSession (no DOM)
+  app/               screen manager and screens (home, first throw, lobby, result, stats)
+  game/              Phaser: TableScene composes parts/ (backdrop, cups, aim, ball flight, drag)
+  match/             MatchController wires domain, game and UI; drivers supply throw outcomes (CPU or online)
+  ui/                DOM components and styles
 ```
 
-The engine is a pure, deterministic state machine that knows nothing about rendering or networking. Solo, online and stats will all run on it.
+Dependencies point one way: `domain` <- `game` and `ui` <- `match` <- `main.ts`.
+The engine is a deterministic state machine that knows nothing about rendering or networking;
+solo, online and stats will all run on it. Throw outcomes come from a seeded model in
+`domain/throw`, not from simulated physics, so the same seed always replays the same match.
+
+## Deploy
+
+The game is a static Vite build, so it deploys to Vercel as is: import the repository in Vercel (build command `npm run build`, output `dist`, both detected automatically and set in `vercel.json`) or run `vercel` from the project folder. Online rooms need no environment variables or backend; the site only has to be served over HTTPS, which Vercel does. Invite links use the site's own address.
 
 ## Roadmap
 
 1. Rules engine with tests (done)
-2. Table rendering and the drag throw
-3. CPU opponent, three levels
-4. Local stats
-5. Online rooms
-6. Accounts and leaderboard
+2. Table rendering and the drag throw (done, on Phaser 4)
+3. CPU opponent, three levels (done)
+4. Local stats (done)
+5. Online rooms (done)
+6. Local leaderboard (records per opponent)
 
 ## License
 

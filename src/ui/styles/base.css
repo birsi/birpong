@@ -1,0 +1,11 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(var(--color-ground-top), var(--color-ground-bottom)) fixed;
+  color: var(--color-text);
+  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+
+button {
+  font: inherit;
+}

@@ -11,6 +11,8 @@ export interface Cup {
 export type Phase = "rps" | "throwing" | "reroll" | "over";
 
 export interface ThrowRecord {
+  /** Turn number, starting at 1; a balls-back round belongs to the same turn. */
+  turn: number;
   side: Side;
   shot: Shot;
   /** Slot of the targeted cup, null for a miss. */
@@ -27,6 +29,8 @@ export interface State {
   /** Side that threw first; decides the re-roll. */
   first: Side | null;
   thrower: Side;
+  /** Current turn number, starting at 1. */
+  turn: number;
   /** Throws taken in the current round (0-2). */
   ballsThrown: number;
   hitsInRound: number;
@@ -39,5 +43,4 @@ export interface State {
 }
 
 export type Action =
-  | { type: "rps"; choices: [Rps, Rps] }
-  | { type: "throw"; shot: Shot; target: number | null };
+  { type: "rps"; choices: [Rps, Rps] } | { type: "throw"; shot: Shot; target: number | null };
