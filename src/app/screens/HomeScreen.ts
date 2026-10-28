@@ -101,8 +101,13 @@ export class HomeScreen implements Screen {
     return this.nameCard;
   }
 
+  /**
+   * Whether the name field holds a valid name right now. Valid names are saved as they are typed,
+   * so this also means the saved name is the one in the field; an earlier saved name does not
+   * count once the field has been cleared or changed to something invalid.
+   */
   private get named(): boolean {
-    return this.profile.nickname() !== null;
+    return checkNickname(this.nameInput.value).ok;
   }
 
   /** The player tried to go on without a name: say so and put the cursor in the name field. */
