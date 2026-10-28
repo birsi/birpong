@@ -46,6 +46,12 @@ export function throwBall(state: State, shot: Shot, targetId: number | null): St
       },
     ],
   };
+
+  // Every cup left is already hit: there is nothing more to throw at, so the turn is over now
+  // (no second ball, no balls back) and the cups are removed.
+  const nothingLeft = state.cups[defender].every((c) => next.pending.includes(c.id));
+  if (nothingLeft) return endTurn(next);
+
   if (next.ballsThrown < BALLS_PER_ROUND) return next;
 
   // Balls back: both balls hit, once per turn (not in the last-chance re-roll).

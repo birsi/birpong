@@ -64,14 +64,13 @@ describe("summarizeSide", () => {
 describe("summarizeMatch", () => {
   const play = (state: State, ...actions: Action[]) => actions.reduce(reduce, state);
 
-  /** Side 0 clears side 1's single cup, side 1 then misses the re-roll. */
+  /** Side 0 clears side 1's single cup with its first ball, side 1 then misses the re-roll. */
   const finished = (): State => {
     const start = reduce(initialState(), { type: "rps", choices: ["rock", "scissors"] });
     const lastCup = { ...start, cups: [start.cups[0], start.cups[1].slice(0, 1)] as State["cups"] };
     return play(
       lastCup,
-      { type: "throw", shot: "air", target: 0 },
-      { type: "throw", shot: "air", target: null },
+      { type: "throw", shot: "air", target: 0 }, // clears the rack at once: no second ball
       { type: "throw", shot: "air", target: null },
       { type: "throw", shot: "air", target: null },
     );
@@ -80,7 +79,7 @@ describe("summarizeMatch", () => {
   it("records a win with both sides' numbers", () => {
     const record = summarizeMatch(finished(), 0, meta);
     expect(record).toMatchObject({ result: "win", opponent: "CPU easy", id: "m1" });
-    expect(record.you).toMatchObject({ throws: 2, hits: 1, cupsSunk: 1 });
+    expect(record.you).toMatchObject({ throws: 1, hits: 1, cupsSunk: 1 });
     expect(record.opp).toMatchObject({ throws: 2, hits: 0, cupsSunk: 0 });
   });
 

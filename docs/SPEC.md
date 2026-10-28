@@ -26,6 +26,7 @@ The rule summary below was taken from the page above and then adjusted by projec
 - Air shot: thrown directly at a cup. A hit removes 1 cup.
 - Bounce shot: touches the table before the cup. A hit removes 2 cups: the cup that was hit and the nearest other standing cup that is not already hit this turn. The second cup is picked automatically.
 - Balls back: if both balls of a turn hit, the thrower gets both balls back and throws again. This happens at most once per turn, and not in the re-roll.
+- If every cup the other side has left is already hit this turn, the turn ends at once: there is nothing more to throw at, so no second ball and no balls back, and the cups are removed.
 - After the turn (and any balls-back round), the other side throws.
 
 ### Cup contact
@@ -56,6 +57,7 @@ Where a ball lands decides what it does. Distances are measured from the cup cen
 | ----------------------------- | ------------------------------------------------------------------------------------------------- |
 | Re-rack position              | The pyramid is rebuilt from the tip of the rack (nearest the centre line), not from the table end. |
 | Re-rack timing                | Only after the whole turn, including a balls-back round.                                          |
+| Last cups already hit         | The turn ends at once: no second ball, no balls back. The source only says cups are removed after both throws and does not cover this case. |
 | Both balls in the same cup    | Only that one cup is removed, and balls back still applies.                                       |
 | Second cup after a bounce hit | The nearest other standing cup not already hit this turn, picked automatically.                   |
 | Re-roll that clears the rack  | Sudden death (see "Start and end"). The source defines no overtime.                               |
