@@ -1,13 +1,9 @@
-import { initialState, reduce, type Rps, type State } from "../domain/engine";
-import type { Rng } from "../domain/throw";
+import { initialState, reduce, type Side, type State } from "../domain/engine";
 
-const CHOICES: Rps[] = ["rock", "paper", "scissors"];
-
-/** A fresh match with the first thrower decided by rock, paper, scissors (ties replayed). */
-export function newMatch(rng: Rng): State {
-  let state = initialState();
-  while (state.phase === "rps") {
-    state = reduce(state, { type: "rps", choices: [rng.pick(CHOICES), rng.pick(CHOICES)] });
-  }
-  return state;
+/** A fresh match in which `first` has won rock, paper, scissors and throws first. */
+export function newMatch(first: Side): State {
+  return reduce(initialState(), {
+    type: "rps",
+    choices: first === 0 ? ["rock", "scissors"] : ["scissors", "rock"],
+  });
 }

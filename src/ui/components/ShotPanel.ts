@@ -7,6 +7,8 @@ export interface ShotPanelView {
   shot: Shot;
   /** 0 to 1, shown while dragging. */
   power: number;
+  /** False while the CPU is throwing. */
+  enabled: boolean;
 }
 
 /** Air/bounce toggle and the power bar, with the bounce window marked. */
@@ -43,9 +45,10 @@ export class ShotPanel {
     this.root.append(shots, power);
   }
 
-  update({ shot, power }: ShotPanelView): void {
+  update({ shot, power, enabled }: ShotPanelView): void {
     for (const key of Object.keys(this.buttons) as Shot[]) {
       this.buttons[key].ariaPressed = String(key === shot);
+      this.buttons[key].disabled = !enabled;
     }
     const percent = Math.round(power * 100);
     this.window.style.display = shot === "bounce" ? "block" : "none";

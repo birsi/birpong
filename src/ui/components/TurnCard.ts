@@ -1,11 +1,11 @@
 import type { TurnView } from "../../match/viewModels";
-import { button, el } from "../dom";
+import { el } from "../dom";
 
 /** Whose turn it is, the state of the two balls, and a line of advice or news. */
 export class TurnCard {
   readonly root = el("section", "card card--turn");
 
-  constructor(private readonly onPlayAgain: () => void) {
+  constructor() {
     this.root.ariaLabel = "Turn";
   }
 
@@ -24,8 +24,5 @@ export class TurnCard {
     }
 
     this.root.replaceChildren(head, el("p", undefined, view.text));
-    if (view.over) {
-      this.root.append(button("btn btn--primary", "Play again", this.onPlayAgain));
-    }
   }
 }

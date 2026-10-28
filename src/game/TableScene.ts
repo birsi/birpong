@@ -67,6 +67,11 @@ export class TableScene extends Phaser.Scene {
     this.aim.draw(this.drag.current, view.shot, view.state);
   }
 
+  /** Show an aim that is not being dragged (the CPU's), or clear it with null. */
+  previewAim(aim: Aim | null, shot: Shot): void {
+    if (this.view) this.aim.draw(aim, shot, this.view.state);
+  }
+
   playFlight(side: Side, result: ThrowResult, shot: Shot): Promise<void> {
     return this.balls.play(side, result, shot);
   }

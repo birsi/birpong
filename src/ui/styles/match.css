@@ -348,3 +348,12 @@
 .card--log {
   flex-basis: 420px;
 }
+.shot:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.match__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

@@ -4,17 +4,28 @@ import type { Contact } from "../domain/throw";
 
 export type Names = readonly [string, string];
 
+/** The human is addressed as "You", so texts need second-person grammar. */
+export const YOU = "You";
+const isYou = (name: string): boolean => name === YOU;
+const possessive = (name: string): string => (isYou(name) ? "Your" : `${name}'s`);
+/** Present-tense verb agreeing with the name: "You get", "CPU gets". */
+const verb = (name: string, base: string): string => (isYou(name) ? base : `${base}s`);
+
+import type { CpuLevel } from "../domain/cpu";
+
+/** "medium" -> "Medium". */
+export const levelLabel = (level: CpuLevel): string =>
+  level.charAt(0).toUpperCase() + level.slice(1);
+
 /** Big heading of the turn card. */
 export function turnTitle(state: State, names: Names): string {
-  if (state.phase === "over") return `${names[state.winner!]} wins`.toUpperCase();
+  if (state.phase === "over") {
+    const winner = names[state.winner!];
+    return `${winner} ${verb(winner, "win")}`.toUpperCase();
+  }
   if (state.phase === "reroll") return "LAST CHANCE";
   if (state.suddenDeath) return "SUDDEN DEATH";
-  return `${names[state.thrower]}'s turn`.toUpperCase();
-}
-
-/** Said at the start of a match: who throws first and why. */
-export function openingNote(state: State, names: Names): string {
-  return `${names[state.first ?? state.thrower]} won rock, paper, scissors and throws first.`;
+  return `${possessive(names[state.thrower])} turn`.toUpperCase();
 }
 
 /** Advice under the heading while nothing else has just happened. */
@@ -51,7 +62,8 @@ const cups = (n: number) => `${n} ${n === 1 ? "cup" : "cups"}`;
 export function turnSummary(before: State, after: State, names: Names): string {
   if (after.phase === "over") return "";
   if (after.phase === "reroll" && before.phase !== "reroll") {
-    return `${names[before.thrower]} cleared the rack. ${names[after.thrower]} gets one last turn.`;
+    const next = names[after.thrower];
+    return `${names[before.thrower]} cleared the rack. ${next} ${verb(next, "get")} one last turn.`;
   }
   if (after.suddenDeath && !before.suddenDeath) return "Sudden death. New 3-cup racks.";
 

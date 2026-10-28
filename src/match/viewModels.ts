@@ -15,14 +15,14 @@ export interface ScoreView {
   dots: DotKind[];
 }
 
-export function scoreView(state: State, side: Side, names: Names): ScoreView {
+export function scoreView(state: State, side: Side, name: string): ScoreView {
   const standing = state.cups[side].length;
   // Cups hit by the thrower this turn are still on the table until the turn ends.
   const hits = side === state.thrower ? 0 : state.pending.length;
   const dots: DotKind[] = Array.from({ length: CUPS_PER_SIDE }, (_, i) =>
     i < standing - hits ? "standing" : i < standing ? "hit" : "gone",
   );
-  return { side, name: names[side], tag: side === 0 ? "P1" : "P2", standing, dots };
+  return { side, name, tag: side === 0 ? "YOU" : "CPU", standing, dots };
 }
 
 export type BallKind = "hit" | "miss" | "now" | "waiting";
@@ -40,7 +40,13 @@ export interface TurnView {
   over: boolean;
 }
 
-export function turnView(state: State, shot: Shot, note: string, names: Names): TurnView {
+export function turnView(
+  state: State,
+  shot: Shot,
+  note: string,
+  names: Names,
+  humanTurn: boolean,
+): TurnView {
   const over = state.phase === "over";
   const thrown = state.log.slice(state.log.length - state.ballsThrown);
   const balls = over
@@ -56,7 +62,9 @@ export function turnView(state: State, shot: Shot, note: string, names: Names): 
         if (i === state.ballsThrown) return { kind: "now", label: `Ball ${n} aiming` };
         return { kind: "waiting", label: `Ball ${n}` };
       });
-  return { title: turnTitle(state, names), balls, text: note || hint(state, shot), over };
+  const waiting = `${names[state.thrower]} is aiming…`;
+  const text = note || (humanTurn || over ? hint(state, shot) : waiting);
+  return { title: turnTitle(state, names), balls, text, over };
 }
 
 export interface LogRow {
