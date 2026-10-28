@@ -102,24 +102,17 @@ export class HomeScreen implements Screen {
     who.append(
       el("span", "label", "Playing as"),
       nameRow,
-      el(
-        "p",
-        "muted",
-        "Stats are saved on this device. Sign in to sync them and join the leaderboard.",
-      ),
+      el("p", "muted", "Stats are saved on this device only."),
     );
 
     const rules = el("a", "btn", "Rules");
     rules.href = RULES_URL;
     rules.target = "_blank";
     rules.rel = "noreferrer";
-    const signIn = el("button", "btn btn--accent", "Sign in");
-    signIn.disabled = true;
     const links = el("nav", "inline");
     links.append(
       button("btn", "Stats", () => this.nav.stats()),
       rules,
-      signIn,
     );
     bar.append(who, links);
     return bar;

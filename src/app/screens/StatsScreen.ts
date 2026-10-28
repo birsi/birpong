@@ -23,20 +23,14 @@ export class StatsScreen implements Screen {
       el("h1", "display display--big", profile.nickname().toUpperCase()),
       el("span", "tag tag--guest", "GUEST"),
     );
-    const signIn = el("div", "card card--note");
-    const signInButton = el("button", "btn btn--accent", "Sign in");
-    signInButton.disabled = true;
-    signIn.append(
-      el("p", "muted", "Stats live on this device. Sign in to sync them and join the leaderboard."),
-      signInButton,
-    );
+    const note = el("p", "muted", "Stats are saved on this device only.");
     const top = el("div", "topbar topbar--top");
-    top.append(who, signIn);
+    top.append(who, note);
 
     const tabs = el("div", "inline");
     const mine = el("button", "segmented__item segmented__item--tab", "My stats");
     mine.ariaPressed = "true";
-    const board = el("button", "segmented__item segmented__item--tab", "Leaderboard");
+    const board = el("button", "segmented__item segmented__item--tab", "Records");
     board.disabled = true;
     tabs.append(mine, board);
 

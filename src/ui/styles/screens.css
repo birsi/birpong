@@ -156,10 +156,6 @@
   width: 100%;
   min-height: 48px;
 }
-.btn--accent {
-  color: var(--color-accent);
-  border-color: var(--color-accent);
-}
 .btn:disabled {
   opacity: 0.5;
   cursor: default;
@@ -322,13 +318,6 @@
 }
 .topbar--top {
   align-items: flex-start;
-}
-.card--note {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 560px;
-  flex: none;
 }
 .segmented__item--tab {
   flex: none;
