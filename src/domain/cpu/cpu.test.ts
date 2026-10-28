@@ -36,6 +36,21 @@ describe("chooseThrow", () => {
     }
   });
 
+  it("does not aim at a cup it has already hit this turn", () => {
+    const state: State = { ...cpuUp(), pending: [0, 1, 2, 3, 4, 5, 6, 7, 8] };
+    for (const level of CPU_LEVELS) {
+      for (let seed = 1; seed <= 30; seed++) {
+        expect(chooseThrow(state, 1, level, createRng(seed)).target).toBe(9);
+      }
+    }
+  });
+
+  it("falls back to any cup when every cup is already hit", () => {
+    const all = Array.from({ length: 10 }, (_, i) => i);
+    const state: State = { ...cpuUp(), pending: all };
+    expect(chooseThrow(state, 1, "hard", createRng(1)).target).toBeGreaterThanOrEqual(0);
+  });
+
   it("never picks bounce on easy", () => {
     const rng = createRng(2);
     for (let i = 0; i < 300; i++) {

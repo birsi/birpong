@@ -52,7 +52,10 @@ function chooseTarget(side: Side, cups: readonly Cup[], level: CpuLevel, rng: Rn
 /** Decide what `side` throws next: a target, a shot type and an aim with the level's error. */
 export function chooseThrow(state: State, side: Side, level: CpuLevel, rng: Rng): CpuThrow {
   const defender = opponent(side);
-  const cups = state.cups[defender];
+  // Cups already hit this turn stay on the table until the turn ends; aiming at them again would
+  // only earn balls back, not another cup.
+  const fresh = state.cups[defender].filter((c) => !state.pending.includes(c.id));
+  const cups = fresh.length > 0 ? fresh : state.cups[defender];
   if (cups.length === 0) throw new Error("no cups to aim at");
 
   const origin = BALL_START[side];
