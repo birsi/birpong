@@ -519,3 +519,37 @@
 .field--invalid:focus-visible {
   outline-color: var(--color-brand-aws);
 }
+
+/* Records */
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.stats-section[hidden] {
+  display: none;
+}
+.card.stats-section {
+  gap: 12px;
+}
+.rate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rate span:first-child {
+  min-width: 3ch;
+}
+.meter {
+  display: block;
+  width: 72px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+.meter i {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}

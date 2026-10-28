@@ -78,7 +78,7 @@ The game is a static Vite build, so it deploys to Vercel as is: import the repos
 3. CPU opponent, three levels (done)
 4. Local stats (done)
 5. Online rooms (done)
-6. Local leaderboard (records per opponent)
+6. Local leaderboard (records per opponent) (done)
 
 ## License
 

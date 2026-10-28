@@ -2,7 +2,7 @@
 
 Birpong is an online, playable beer pong game for the browser: 2D, bird's-eye view, minimal and slightly retro. It is built in iterations. This file records what has been decided, what the design shows, and what is still open.
 
-Status: iterations 1 to 5 are built (rules engine, table and drag throw, solo CPU on three levels, local stats, online rooms). The local leaderboard is next. There are no accounts and none are planned: everything a player has lives in their own browser.
+Status: all six planned iterations are built (rules engine, table and drag throw, solo CPU on three levels, local stats, online rooms, local leaderboard). The game is on `main` and ready to deploy as a static site; it has not been deployed yet. What is left is in "Open decisions". There are no accounts and none are planned: everything a player has lives in their own browser.
 
 ## Sources
 
@@ -78,7 +78,7 @@ Physical fouls from the source (touching the table, knocking over own cups, spec
 - Solo: one human against a CPU, on three levels (easy, medium, hard).
 - Online: 1 v 1 in a room joined by a 4-character code or an invite link (`?r=CODE`). No account needed, only a nickname. The room creator is host and plays the left end; the guest plays the right end. Both players pick rock, paper, scissors in the lobby; the host presses Start once the first throw is decided. The rules are the same as in solo.
 
-Out of scope: accounts and sign-in, syncing across devices, any server-side storage of stats, a global leaderboard, public matchmaking, local hot-seat, true 2 v 2 with four seats, phone portrait layout.
+Out of scope: accounts and sign-in, syncing across devices, any server-side storage of stats, a global or shared leaderboard, public matchmaking, local hot-seat, true 2 v 2 with four seats, phone portrait layout.
 
 ### CPU opponent
 
@@ -128,7 +128,7 @@ All values are placeholders in `src/domain/throw/constants.ts`, not tuned. One f
 - No sign-in, but a name is required: the home screen asks "Who are you?" first, and solo, online and creating or joining a room stay locked until a valid name is saved. There is no default name, so nobody plays as an anonymous guest. A name has 2 to 16 characters and may not be a placeholder (guest, you, cpu, player, opponent). The name is kept in the browser.
 - An invite link opened without a name lands on the home screen with the room waiting; once a name is set the player joins with one click.
 - Everything is stored in the browser (`localStorage`) behind a small store interface. Clearing browser data clears the stats. There is no sync between devices.
-- Every finished match is saved on the device: solo matches and, once online rooms exist, online matches. In an online match each player's browser builds the record from the final throw log and saves it itself, with mode Online and the opponent's nickname.
+- Every finished match is saved on the device: solo matches and online matches. A match that ends because the other player left is not saved. In an online match each player's browser builds the record from the final throw log and saves it itself, with mode Online and the opponent's nickname.
 
 Recorded per match: date, mode, opponent, result, cups sunk by each side, throws, hits, bounce hits, balls-back count, best streak of consecutive hits, and which rack position each hit landed in.
 
@@ -136,7 +136,12 @@ Shown in aggregate: matches, wins, win rate, hit rate, balls back, best streak, 
 
 ### Local leaderboard
 
-Records per opponent, computed from the matches saved on the device: matches played, won and win rate against each CPU level and against each online opponent nickname met. It is a tab on the stats screen, next to "My stats". It replaces the "Leaderboard" tab of the design, which assumed accounts. Not built yet.
+Records per opponent, computed from the matches saved on the device. It is the "Records" tab on the stats screen, next to "My stats", and replaces the "Leaderboard" tab of the design, which assumed accounts. The design does not show what the tab contains; this is what is built:
+
+- One row per opponent met: matches played, won, lost, win rate (with a small bar) and the date of the last match.
+- CPU levels come first, from easy to hard. Online opponents follow, the ones played most often first, then by wins, then by name.
+- Online opponents are matched by nickname, ignoring case and surrounding spaces, and shown with their latest spelling. An online player who is called "CPU easy" is a separate row from the CPU.
+- With no matches the tab says so. Because nothing leaves the device, the list only ever contains opponents this browser has played; it is not a ranking of players.
 
 ## Screens
 
@@ -148,7 +153,7 @@ Records per opponent, computed from the matches saved on the device: matches pla
 | `match.html`           | Match, air shot selected: scoreboards, turn card, table, aim line, shot toggle, power, throw log | Built |
 | `match-bounce.html`    | Match, bounce selected: bounce marker, wider landing ring, power window                      | Built     |
 | `result.html`          | Winner, final table, per-player match stats, rematch                                         | Built     |
-| `stats.html`           | Guest profile, stat tiles, hits per rack position, recent matches                            | Built; records tab not built |
+| `stats.html`           | Profile, stat tiles, hits per rack position, recent matches, records tab                     | Built (records tab replaces the leaderboard tab) |
 | `states.html`          | Reference sheet: rack formations at 10, 6, 3, 1; cup and ball states; turn banners           | Reference |
 
 All names, scores and numbers in the design are sample data. `[YOUR-DOMAIN]` in the lobby is a placeholder. The designs are static: links between them work, nothing else does.
@@ -197,14 +202,14 @@ The rules engine is a pure, deterministic state machine: `(state, action) -> sta
 3. CPU opponent, three levels. Done.
 4. Local stats. Done.
 5. Online rooms. Done.
-6. Local leaderboard (records per opponent).
+6. Local leaderboard (records per opponent). Done.
 
 ## Decided
 
 - Stack: TypeScript, Vite, Vitest. The table scene is rendered with Phaser 4 (Canvas/WebGL via AUTO, no physics modules).
 - Throw model v1: seeded scatter, cup core and rim, ricochet, rack exit (values to tune).
 - Rules questions closed: re-rack timing, the re-roll that also clears the rack (sudden death), second cup after a bounce hit (automatic).
-- No accounts; stats and the leaderboard stay in the browser.
+- No accounts; stats and the leaderboard stay in the browser. The local leaderboard is records per opponent.
 - Online transport: Trystero (WebRTC, public relays for matchmaking), host rolls outcomes, no game server. Hosting: static build on Vercel.
 - Online edge cases: a disconnect ends the match without a record, rematch returns to the lobby, duplicate nicknames are allowed.
 
@@ -222,11 +227,12 @@ Technical:
 - Reconnect: whether a player who drops can come back to a running match, instead of ending it.
 - Throw preview online: showing the opponent's aim while they drag, as the CPU's aim is shown.
 - Tuning: bounce difficulty, rim odds and the CPU levels, once real players have tried them.
-- Local data: whether to offer export, import or reset of the saved stats.
+- Local data: whether to offer export, import or reset of the saved stats; the 500-match cap is silent.
+- Deploy: the static build is ready for Vercel (`vercel.json`, README notes) but nothing is deployed yet.
 
 ## Verification
 
-- `npm run check` (typecheck, lint, tests): engine rules including the project decisions, throw model, CPU, stats, storage, view-model and online (protocol, session, drivers over an in-memory link) tests.
+- `npm run check` (typecheck, lint, tests): engine rules including the project decisions, throw model, CPU, stats, records per opponent, storage, view-model and online (protocol, session, drivers over an in-memory link) tests.
 - CPU strength: simulate full matches between the levels and check easy < medium < hard.
 - Online: two headless browsers, one creates a room and the other joins by code or invite link; play a match from both sides, check both result screens and records, rematch and leaving.
-- UI: run the app in a headless browser, play a solo match to the end, check the result and stats screens and a reload; screenshot at 1280 px width and compare against `docs/design/screens/`.
+- UI: run the app in a headless browser, play a solo match to the end, check the result and stats screens (both tabs) and a reload; screenshot at 1280 px width and compare against `docs/design/screens/`.
