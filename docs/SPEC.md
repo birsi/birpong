@@ -24,7 +24,7 @@ The rule summary below was taken from the page above and then adjusted by projec
 - A turn is 2 balls. In all current modes one player throws both.
 - A hit cup stays on the table until the turn's throws are complete, then it is removed.
 - Air shot: thrown directly at a cup. A hit removes 1 cup.
-- Bounce shot: touches the table before the cup. A hit removes 2 cups: the cup that was hit and the nearest other standing cup that is not already hit this turn. The second cup is picked automatically.
+- Bounce shot: touches the table before the cup. A hit removes 2 cups: the cup that was hit and the nearest other standing cup that is not already hit this turn. The thrower clicks the second cup on the table. It may be any other standing cup not already hit this turn. If only one such cup is left, or the CPU threw, it is taken automatically (the nearest).
 - Balls back: if both balls of a turn hit, the thrower gets both balls back and throws again. This happens at most once per turn, and not in the re-roll.
 - If every cup the other side has left is already hit this turn, the turn ends at once: there is nothing more to throw at, so no second ball and no balls back, and the cups are removed.
 - After the turn (and any balls-back round), the other side throws.
@@ -59,19 +59,19 @@ Where a ball lands decides what it does. Distances are measured from the cup cen
 | Re-rack timing                | Only after the whole turn, including a balls-back round.                                          |
 | Last cups already hit         | The turn ends at once: no second ball, no balls back. The source only says cups are removed after both throws and does not cover this case. |
 | Both balls in the same cup    | Only that one cup is removed, and balls back still applies.                                       |
-| Second cup after a bounce hit | The nearest other standing cup not already hit this turn, picked automatically.                   |
+| Second cup after a bounce hit | The thrower picks any other standing cup not already hit this turn. The CPU and a lone remaining cup are automatic (nearest). |
 | Re-roll that clears the rack  | Sudden death (see "Start and end"). The source defines no overtime.                               |
 | Bounce without defence        | Bounce stays worth 2 cups but is harder to land than an air shot.                                 |
-| Defending and blowing         | Not in the first iterations. No blocking of bounce shots, no blowing out a circling ball.         |
+| Defending and blowing         | Dropped. No blocking of bounce shots, no blowing out a circling ball.                             |
 | Solo first throw              | Rock, paper, scissors against the CPU, same as online.                                            |
 | Team size                     | 1 v 1; the one player throws both balls. The source rules are 2 v 2.                              |
-| Time limit                    | Off. The source gives no duration; the lobby design shows Off, 10 min, 15 min as a placeholder.   |
+| Time limit                    | Dropped. Matches have no clock; the lobby design no longer shows one.                             |
 | Accounts                      | None. Players have a nickname, which they must choose before playing (no anonymous guests).        |
 | Stats and leaderboard         | Stored only in the player's own browser. Nothing is stored on a server.                           |
 
 ### Not applicable in a digital game
 
-Physical fouls from the source (touching the table, knocking over own cups, spectator interference, elbow position) have no input that could cause them. The "Foul, cup lost" banner in the design is reserved for later.
+Physical fouls from the source (touching the table, knocking over own cups, spectator interference, elbow position) have no input that could cause them. The "Foul, cup lost" banner in the design is dropped.
 
 ## Modes
 
@@ -97,14 +97,14 @@ The CPU never aims at a cup it has already hit this turn (unless every cup is hi
 There is no game server. Players find each other with Trystero (public relays are used only to introduce the two browsers) and then talk directly over a WebRTC data channel. The static game can be hosted anywhere; it is deployed on Vercel.
 
 - Authority: both browsers hold the same match state and apply the same rules engine. Only the host rolls throw outcomes (scatter, rim, ricochet), so both players see the same result. A guest sends its aim to the host, the host answers with the outcome, and both play it and apply it. Cheating is not a concern: the host could in principle change outcomes, and that is accepted.
-- Messages: `hello`, `welcome`, `full`, `rps`, `start`, `throw`, `outcome`, `rematch`. Incoming messages are validated and anything malformed is ignored.
+- Messages: `hello`, `welcome`, `full`, `rps`, `start`, `throw`, `outcome`, `pick`, `rematch`. Incoming messages are validated and anything malformed is ignored.
 - Room full: a third person who joins gets "That room is full".
 - Finding the room: a guest that hears nothing from the host for 12 seconds is told the room could not be found or reached.
 - Disconnects: if the other player leaves or drops during a match, the match ends without a record and the home screen says so. There is no reconnect.
 - Rematch: after a match both players press Rematch and return to the lobby of the same room (new rock, paper, scissors).
 - Nicknames: two players may have the same nickname.
 - Each browser saves its own record of an online match (mode Online, opponent's nickname).
-- Without a TURN server, some strict networks cannot form a direct connection. Those players cannot join; see the open decisions.
+- Without a TURN server, some strict networks cannot form a direct connection. Those players cannot join. This is accepted: no TURN server, to keep the project simple.
 
 ## Throw input
 
@@ -148,7 +148,7 @@ Records per opponent, computed from the matches saved on the device. It is the "
 | File in `docs/design/` | Screen                                                                                       | Status    |
 | ---------------------- | -------------------------------------------------------------------------------------------- | --------- |
 | `home.html`            | Mode select (solo with CPU level, online create or join), nickname, links to stats and rules | Built |
-| `lobby.html`           | Online room: code, invite link, two seats, rock-paper-scissors, match rules, time limit      | Built; no time limit |
+| `lobby.html`           | Online room: code, invite link, two seats, rock-paper-scissors, match rules                  | Built     |
 | `first-throw.html`     | Solo rock-paper-scissors against the CPU                                                     | Built     |
 | `match.html`           | Match, air shot selected: scoreboards, turn card, table, aim line, shot toggle, power, throw log | Built |
 | `match-bounce.html`    | Match, bounce selected: bounce marker, wider landing ring, power window                      | Built     |
@@ -162,7 +162,8 @@ Deviations of the app from the design, because there are no accounts:
 
 - No "Sign in" button on the home or stats screens, and the copy no longer mentions syncing or signing in.
 - The "Leaderboard" tab on the stats screen becomes local records per opponent.
-- The lobby has no time-limit buttons, because the time limit is off. The invite link uses the site's own address instead of `[YOUR-DOMAIN]`.
+- The invite link uses the site's own address instead of `[YOUR-DOMAIN]`.
+- `screens/lobby.png` still shows the removed time-limit buttons; re-render it from `lobby.html`.
 
 ### Table geometry used in the design
 
@@ -203,6 +204,7 @@ The rules engine is a pure, deterministic state machine: `(state, action) -> sta
 4. Local stats. Done.
 5. Online rooms. Done.
 6. Local leaderboard (records per opponent). Done.
+7. Pick the second cup after a bounce hit: optional `second` on the engine's throw action, clickable candidate cups on the table, `pick` message online. Done; not yet played in a browser.
 
 ## Decided
 
@@ -212,23 +214,13 @@ The rules engine is a pure, deterministic state machine: `(state, action) -> sta
 - No accounts; stats and the leaderboard stay in the browser. The local leaderboard is records per opponent.
 - Online transport: Trystero (WebRTC, public relays for matchmaking), host rolls outcomes, no game server. Hosting: static build on Vercel.
 - Online edge cases: a disconnect ends the match without a record, rematch returns to the lobby, duplicate nicknames are allowed.
+- Dropped to keep the project simple: time limit, defending and blowing, the "Foul, cup lost" banner, TURN server, reconnect, online throw preview, export/import/reset of local stats (the silent 500-match cap stays).
+- The thrower picks the second cup after a bounce hit (iteration 7).
 
 ## Open decisions
 
-Rules:
-
-- Time limit: duration and what happens at the signal. Currently off; only the lobby design shows it.
-- Whether the thrower should be able to pick the second cup after a bounce hit (UI not designed); today it is automatic.
-- Defending and blowing, and the "Foul, cup lost" banner.
-
-Technical:
-
-- TURN fallback: without a TURN server, some strict networks cannot connect directly. Decide whether to add a TURN service, and whether the relays Trystero uses are reliable enough.
-- Reconnect: whether a player who drops can come back to a running match, instead of ending it.
-- Throw preview online: showing the opponent's aim while they drag, as the CPU's aim is shown.
-- Tuning: bounce difficulty, rim odds and the CPU levels, once real players have tried them.
-- Local data: whether to offer export, import or reset of the saved stats; the 500-match cap is silent.
-- Deploy: the static build is ready for Vercel (`vercel.json`, README notes) but nothing is deployed yet.
+- Tuning: bounce difficulty, rim odds and the CPU levels, once real players have tried them. Not now.
+- Deploy: the static build is ready for Vercel (`vercel.json`, README notes) but nothing is deployed yet. Handled later.
 
 ## Verification
 

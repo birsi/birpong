@@ -58,6 +58,7 @@ export class OnlineSession {
 
   private readonly throwRequests = new Inbox<ThrowRequest>();
   private readonly outcomes = new Inbox<Outcome>();
+  private readonly picks = new Inbox<number>();
   private readonly unsubscribe: (() => void)[] = [];
 
   constructor(
@@ -132,6 +133,16 @@ export class OnlineSession {
     return this.outcomes.next();
   }
 
+  /** The local thrower's second cup after a bounce hit. */
+  sendPick(cup: number): void {
+    this.link.send({ t: "pick", cup }, this.opponent ?? undefined);
+  }
+
+  /** The other player's second cup after their bounce hit. Rejects with `OpponentLeft`. */
+  nextPick(): Promise<number> {
+    return this.picks.next();
+  }
+
   // --- After the match --------------------------------------------------
 
   requestRematch(): void {
@@ -173,6 +184,9 @@ export class OnlineSession {
           this.outcomes.push({ side: message.side, shot: message.shot, result: message.result });
         }
         break;
+      case "pick":
+        this.picks.push(message.cup);
+        break;
       case "rematch":
         this.rematchTheirs = true;
         this.settleRematch();
@@ -211,6 +225,7 @@ export class OnlineSession {
     const gone = new OpponentLeft();
     this.throwRequests.close(gone);
     this.outcomes.close(gone);
+    this.picks.close(gone);
     for (const off of this.unsubscribe) off();
     if (notify) this.changed.emit();
   }

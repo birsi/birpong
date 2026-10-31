@@ -72,6 +72,11 @@ export class TableScene extends Phaser.Scene {
     if (this.view) this.aim.draw(aim, shot, this.view.state);
   }
 
+  /** Let the player click the second cup of their bounce hit; resolves with its id. */
+  chooseSecondCup(defender: Side, target: number, candidates: number[]): Promise<number> {
+    return this.cups.choose(defender, target, candidates);
+  }
+
   playFlight(side: Side, result: ThrowResult, shot: Shot): Promise<void> {
     return this.balls.play(side, result, shot);
   }

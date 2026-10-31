@@ -43,4 +43,6 @@ export interface State {
 }
 
 export type Action =
-  { type: "rps"; choices: [Rps, Rps] } | { type: "throw"; shot: Shot; target: number | null };
+  | { type: "rps"; choices: [Rps, Rps] }
+  /** `second`: the cup the thrower picks as the extra hit of a bounce shot; nearest if left out. */
+  | { type: "throw"; shot: Shot; target: number | null; second?: number };
