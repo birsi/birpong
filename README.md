@@ -71,6 +71,8 @@ solo, online and stats will all run on it. Throw outcomes come from a seeded mod
 
 The game is a static Vite build, so it deploys to Vercel as is: import the repository in Vercel (build command `npm run build`, output `dist`, both detected automatically and set in `vercel.json`) or run `vercel` from the project folder. Online rooms need no environment variables or backend; the site only has to be served over HTTPS, which Vercel does. Invite links use the site's own address.
 
+The game is live at https://birpong.birsak.net (Vercel project `birpong`, connected to this repository, so every merge to `main` deploys to production). For a manual deploy, run `vercel --prod` from the project folder.
+
 ## Roadmap
 
 1. Rules engine with tests (done)
