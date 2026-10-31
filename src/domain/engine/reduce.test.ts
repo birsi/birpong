@@ -53,6 +53,22 @@ describe("turns", () => {
     const slots = s.pending.map((id) => s.cups[1].find((c) => c.id === id)!.slot).sort();
     expect(slots).toEqual([0, 1]);
   });
+  it("lets the thrower pick the second cup of a bounce hit", () => {
+    const s = play(started(), { type: "throw", shot: "bounce", target: 0, second: 9 });
+    expect(s.pending).toEqual([0, 9]);
+    expect(s.log.at(-1)?.marked).toBe(2);
+  });
+  it("rejects a second cup that is the target, already hit or not on the table", () => {
+    const first = play(started(), air(1));
+    const pick = (second: number): Action => ({ type: "throw", shot: "bounce", target: 0, second });
+    expect(() => reduce(started(), pick(0))).toThrow();
+    expect(() => reduce(started(), pick(99))).toThrow();
+    expect(() => reduce(first, pick(1))).toThrow();
+  });
+  it("takes only the target when no other cup is left", () => {
+    const s = play(withCups(started(), 1, 1), { type: "throw", shot: "bounce", target: 0 });
+    expect(s.cups[1]).toHaveLength(0);
+  });
   it("gives balls back once when both balls hit", () => {
     let s = play(started(), air(0), air(1));
     expect(s.thrower).toBe(0);

@@ -1,4 +1,11 @@
-import { reduce, type Shot, type Side, type State } from "../domain/engine";
+import {
+  opponent,
+  reduce,
+  secondCupCandidates,
+  type Shot,
+  type Side,
+  type State,
+} from "../domain/engine";
 import type { Aim } from "../domain/throw";
 import { createGame } from "../game/createGame";
 import { TableScene } from "../game/TableScene";
@@ -161,10 +168,25 @@ export class MatchController {
     this.render();
     await this.scene.playFlight(thrown.side, thrown.result, thrown.shot);
     if (this.disposed) return;
+
+    let second: number | undefined;
+    try {
+      second = await this.pickSecondCup(thrown);
+    } catch (error) {
+      if (error instanceof OpponentLeft && !this.disposed) this.callbacks.onOpponentLeft();
+      else if (!(error instanceof OpponentLeft)) throw error;
+      return;
+    }
+    if (this.disposed) return;
     this.busy = false;
 
     const before = this.state;
-    this.state = reduce(before, { type: "throw", shot: thrown.shot, target: thrown.result.target });
+    this.state = reduce(before, {
+      type: "throw",
+      shot: thrown.shot,
+      target: thrown.result.target,
+      second,
+    });
     this.note = [
       rimNote(thrown.result.contact),
       turnSummary(before, this.state, this.narrationNames),
@@ -173,6 +195,32 @@ export class MatchController {
       .join(" ");
     this.render();
     await this.next();
+  }
+
+  /**
+   * After a bounce hit the thrower chooses the second cup: the local player clicks one, an online
+   * opponent sends their choice. Returns undefined when there is nothing to choose (one or no
+   * cup left to take) or the CPU threw, and the rules take the nearest cup.
+   */
+  private async pickSecondCup(thrown: ResolvedThrow): Promise<number | undefined> {
+    const { side, shot, result } = thrown;
+    if (shot !== "bounce" || result.target === null) return undefined;
+    const candidates = secondCupCandidates(this.state, result.target).map((c) => c.id);
+    if (candidates.length < 2) return undefined;
+
+    if (side === this.driver.localSide) {
+      this.note = "Bounce hit! Click the second cup.";
+      this.render();
+      const cup = await this.scene.chooseSecondCup(opponent(side), result.target, candidates);
+      this.driver.sendPick(cup);
+      return cup;
+    }
+    if (this.driver.mode === "online") {
+      this.note = `${this.driver.opponentName} is choosing the second cup.`;
+      this.render();
+    }
+    const cup = await this.driver.opponentPick();
+    return cup !== undefined && candidates.includes(cup) ? cup : undefined;
   }
 
   private render(): void {

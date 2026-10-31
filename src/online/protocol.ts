@@ -16,6 +16,7 @@ export type Message =
   | { t: "start"; first: Side } // host -> guest
   | { t: "throw"; shot: Shot; aim: Aim } // guest -> host
   | { t: "outcome"; side: Side; shot: Shot; result: ThrowResult } // host -> guest
+  | { t: "pick"; cup: number } // the thrower's second cup after a bounce hit, either way
   | { t: "rematch" };
 
 type Obj = Record<string, unknown>;
@@ -69,6 +70,10 @@ export function parseMessage(raw: unknown): Message | null {
     case "outcome":
       return isSide(raw.side) && isShot(raw.shot) && isResult(raw.result)
         ? { t: "outcome", side: raw.side, shot: raw.shot, result: raw.result }
+        : null;
+    case "pick":
+      return Number.isInteger(raw.cup) && (raw.cup as number) >= 0
+        ? { t: "pick", cup: raw.cup as number }
         : null;
     default:
       return null;

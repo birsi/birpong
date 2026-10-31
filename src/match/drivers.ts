@@ -47,6 +47,10 @@ export interface MatchDriver {
   localThrow(state: State, shot: Shot, aim: Aim): Promise<ResolvedThrow>;
   /** The opponent is up: resolve their next throw (rejects with `OpponentLeft` online). */
   opponentThrow(state: State): Promise<ResolvedThrow>;
+  /** The local player picked the second cup of their bounce hit: pass it on. */
+  sendPick(cup: number): void;
+  /** The opponent's second cup, or undefined when they do not pick one (the CPU). */
+  opponentPick(): Promise<number | undefined>;
   destroy(): void;
 }
 
@@ -93,6 +97,13 @@ export class SoloDriver implements MatchDriver {
     const choice = chooseThrow(state, side, this.level, this.rng);
     const result = this.resolve(state, side, choice.shot, choice.aim);
     return { side, shot: choice.shot, result, preview: this.disposed ? null : choice.aim };
+  }
+
+  sendPick(): void {}
+
+  /** The CPU takes whichever cup the rules give it: the nearest. */
+  async opponentPick(): Promise<undefined> {
+    return undefined;
   }
 
   destroy(): void {
@@ -148,6 +159,14 @@ export class OnlineDriver implements MatchDriver {
       return this.hostResolve(state, opponent(this.localSide), request.shot, request.aim);
     }
     return this.fromOutcome(await this.session.nextOutcome());
+  }
+
+  sendPick(cup: number): void {
+    this.session.sendPick(cup);
+  }
+
+  opponentPick(): Promise<number> {
+    return this.session.nextPick();
   }
 
   destroy(): void {

@@ -73,6 +73,9 @@ describe("parseMessage", () => {
       { t: "throw", shot: "air", aim: { dir: { x: 1, y: 0 }, power: 2, handle: { x: 0, y: 0 } } },
       { t: "throw", shot: "lob", aim: { dir: { x: 1, y: 0 }, power: 0.5, handle: { x: 0, y: 0 } } },
       { t: "outcome", side: 0, shot: "air", result: { landing: { x: 1 } } },
+      { t: "pick" },
+      { t: "pick", cup: -1 },
+      { t: "pick", cup: 1.5 },
     ]) {
       expect(parseMessage(bad)).toBeNull();
     }
@@ -209,6 +212,23 @@ describe("playing a match over the link", () => {
       expect(guestState).toEqual(hostState);
     }
     expect(hostState.log.length).toBeGreaterThan(2);
+  });
+});
+
+describe("second cup pick", () => {
+  it("passes the thrower's pick to the other side, whichever side throws", async () => {
+    const { host, guest } = await room();
+    expect(parseMessage({ t: "pick", cup: 4 })).toEqual({ t: "pick", cup: 4 });
+    host.sendPick(7);
+    expect(await guest.nextPick()).toBe(7);
+    guest.sendPick(2);
+    expect(await host.nextPick()).toBe(2);
+  });
+  it("rejects a waiting reader when the other player leaves", async () => {
+    const { host, guest } = await room();
+    const pending = host.nextPick();
+    guest.leave();
+    await expect(pending).rejects.toBeInstanceOf(OpponentLeft);
   });
 });
 

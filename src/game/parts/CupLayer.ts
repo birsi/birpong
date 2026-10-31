@@ -1,4 +1,4 @@
-import type Phaser from "phaser";
+import Phaser from "phaser";
 import { CUPS_PER_SIDE, slotPosition, type Side, type State } from "../../domain/engine";
 import type { Point } from "../../domain/geometry";
 import { CUP_RADIUS } from "../../domain/throw";
@@ -14,16 +14,27 @@ interface CupObject {
   dot: Phaser.GameObjects.Arc;
 }
 
+/** A bounce hit waiting for the thrower to choose the second cup. */
+interface Pick {
+  side: Side;
+  target: number;
+  candidates: number[];
+}
+
 /** Draws every cup of both racks, and the dashed outlines where cups have been removed. */
 export class CupLayer {
   private readonly cups = new Map<string, CupObject>();
   private readonly holes: Phaser.GameObjects.Graphics;
+  private readonly pickRings: Phaser.GameObjects.Graphics;
+  private pick: Pick | null = null;
+  private pickState: State | null = null;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly palette: Palette,
   ) {
     this.holes = scene.add.graphics();
+    this.pickRings = scene.add.graphics();
     for (const side of [0, 1] as const) {
       for (let id = 0; id < CUPS_PER_SIDE; id++) {
         this.cups.set(this.key(side, id), {
@@ -74,6 +85,59 @@ export class CupLayer {
       }
     }
     this.drawHoles(state);
+    this.pickState = state;
+    this.applyPick(state);
+  }
+
+  /**
+   * Ask which cup the bounce hit takes as its second. The target shows as hit, the candidates are
+   * ringed and clickable; resolves with the clicked cup id.
+   */
+  choose(side: Side, target: number, candidates: number[]): Promise<number> {
+    return new Promise((resolve) => {
+      this.pick = { side, target, candidates };
+      for (const id of candidates) {
+        const body = this.cups.get(this.key(side, id))!.body;
+        body.setInteractive(
+          new Phaser.Geom.Circle(body.radius, body.radius, body.radius),
+          Phaser.Geom.Circle.Contains,
+        );
+        body.input!.cursor = "pointer";
+        body.once("pointerdown", () => {
+          this.endChoice();
+          resolve(id);
+        });
+      }
+      if (this.pickState) this.applyPick(this.pickState);
+    });
+  }
+
+  private endChoice(): void {
+    const pick = this.pick;
+    if (!pick) return;
+    this.pick = null;
+    for (const id of pick.candidates) {
+      const body = this.cups.get(this.key(pick.side, id))!.body;
+      body.off("pointerdown");
+      body.disableInteractive();
+    }
+    this.pickRings.clear();
+    if (this.pickState) this.sync(this.pickState);
+  }
+
+  private applyPick(state: State): void {
+    this.pickRings.clear();
+    const pick = this.pick;
+    if (!pick) return;
+    const target = this.cups.get(this.key(pick.side, pick.target));
+    if (target) this.paint(target, true);
+    this.pickRings.lineStyle(RIM_WIDTH, this.palette.accent);
+    for (const id of pick.candidates) {
+      const cup = state.cups[pick.side].find((c) => c.id === id);
+      if (!cup) continue;
+      const { x, y } = toPx(slotPosition(pick.side, cup.slot));
+      this.pickRings.strokeCircle(x, y, CUP_RADIUS * U + RIM_WIDTH * 1.5);
+    }
   }
 
   private place(object: CupObject, to: Point): void {
