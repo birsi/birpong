@@ -2,7 +2,7 @@
 
 Birpong is an online, playable beer pong game for the browser: 2D, bird's-eye view, minimal and slightly retro. It is built in iterations. This file records what has been decided, what the design shows, and what is still open.
 
-Status: all six planned iterations are built (rules engine, table and drag throw, solo CPU on three levels, local stats, online rooms, local leaderboard). The game is on `main` and ready to deploy as a static site; it has not been deployed yet. What is left is in "Open decisions". There are no accounts and none are planned: everything a player has lives in their own browser.
+Status: all six planned iterations are built (rules engine, table and drag throw, solo CPU on three levels, local stats, online rooms, local leaderboard). The game is on `main` and deployed on Vercel at https://birpong.birsak.net (production; merges to `main` redeploy). What is left is in "Open decisions". There are no accounts and none are planned: everything a player has lives in their own browser.
 
 ## Sources
 
@@ -94,7 +94,7 @@ The CPU never aims at a cup it has already hit this turn (unless every cup is hi
 
 ### Online rooms
 
-There is no game server. Players find each other with Trystero (public relays are used only to introduce the two browsers) and then talk directly over a WebRTC data channel. The static game can be hosted anywhere; it is deployed on Vercel.
+There is no game server. Players find each other with Trystero (public relays are used only to introduce the two browsers) and then talk directly over a WebRTC data channel. The static game can be hosted anywhere; it is deployed on Vercel at https://birpong.birsak.net.
 
 - Authority: both browsers hold the same match state and apply the same rules engine. Only the host rolls throw outcomes (scatter, rim, ricochet), so both players see the same result. A guest sends its aim to the host, the host answers with the outcome, and both play it and apply it. Cheating is not a concern: the host could in principle change outcomes, and that is accepted.
 - Messages: `hello`, `welcome`, `full`, `rps`, `start`, `throw`, `outcome`, `pick`, `rematch`. Incoming messages are validated and anything malformed is ignored.
@@ -219,7 +219,6 @@ The rules engine is a pure, deterministic state machine: `(state, action) -> sta
 ## Open decisions
 
 - Tuning: bounce difficulty, rim odds and the CPU levels, once real players have tried them. Not now.
-- Deploy: the static build is ready for Vercel (`vercel.json`, README notes) but nothing is deployed yet. Handled later.
 
 ## Verification
 
