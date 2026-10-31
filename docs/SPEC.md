@@ -163,7 +163,6 @@ Deviations of the app from the design, because there are no accounts:
 - No "Sign in" button on the home or stats screens, and the copy no longer mentions syncing or signing in.
 - The "Leaderboard" tab on the stats screen becomes local records per opponent.
 - The invite link uses the site's own address instead of `[YOUR-DOMAIN]`.
-- `screens/lobby.png` still shows the removed time-limit buttons; re-render it from `lobby.html`.
 
 ### Table geometry used in the design
 
