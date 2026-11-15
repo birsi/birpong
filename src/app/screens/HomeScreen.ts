@@ -16,6 +16,19 @@ export interface HomeOptions {
   invite?: string;
 }
 
+/** The big title, one span per letter so each can run its own colour animation. */
+function heroTitle(text: string): HTMLHeadingElement {
+  const title = el("h1", "display display--hero");
+  title.ariaLabel = text;
+  [...text].forEach((char, i) => {
+    const letter = el("span", "hero__letter", char);
+    letter.ariaHidden = "true";
+    letter.style.setProperty("--i", String(i));
+    title.append(letter);
+  });
+  return title;
+}
+
 /**
  * The start screen. A name comes first: nothing else can be used until the player has chosen one,
  * so nobody ends up playing as a nameless guest.
@@ -53,12 +66,7 @@ export class HomeScreen implements Screen {
       banner.setAttribute("role", "status");
       page.append(banner);
     }
-    page.append(
-      el("h1", "display display--hero", "BIRPONG"),
-      createTableHero(),
-      this.profileCard(),
-      this.modes(),
-    );
+    page.append(heroTitle("BIRPONG"), createTableHero(), this.profileCard(), this.modes());
     root.replaceChildren(page);
     this.renderLevels();
     this.refresh();

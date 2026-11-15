@@ -51,6 +51,39 @@
   font-weight: 700;
   letter-spacing: 0.12em;
 }
+/* Each letter cycles through the palette a beat after the one before it, so colour ripples across. */
+.hero__letter {
+  display: inline-block;
+  animation: hero-letter 3.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.14s);
+}
+@keyframes hero-letter {
+  0%,
+  100% {
+    color: var(--color-text-strong);
+    transform: translateY(0);
+    filter: none;
+  }
+  18% {
+    color: var(--color-accent);
+    transform: translateY(-0.08em);
+    filter: drop-shadow(0 0 0.18em color-mix(in srgb, var(--color-accent) 70%, transparent));
+  }
+  36% {
+    color: var(--color-brand-aws);
+    transform: translateY(0);
+    filter: drop-shadow(0 0 0.14em color-mix(in srgb, var(--color-brand-aws) 60%, transparent));
+  }
+  55% {
+    color: var(--color-text-strong);
+    filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__letter {
+    animation: none;
+  }
+}
 .display--small {
   font-size: 22px;
 }
