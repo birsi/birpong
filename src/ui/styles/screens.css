@@ -111,6 +111,39 @@
   fill: var(--color-surface);
   stroke: var(--color-text-strong);
   stroke-width: 0.8;
+  transition:
+    opacity 0.5s ease,
+    fill 0.15s ease,
+    stroke 0.15s ease;
+}
+.hero__cup--sunk {
+  fill: var(--color-accent);
+  stroke: var(--color-text-faint);
+  opacity: 0.18;
+  transition:
+    opacity 0.9s ease 0.25s,
+    fill 0.15s ease,
+    stroke 0.9s ease 0.25s;
+}
+/* Ball, shadow and splash are drawn at the origin and moved by the rally animation. */
+.hero__ball,
+.hero__shadow,
+.hero__splash {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.hero__ball {
+  fill: var(--color-text-strong);
+}
+.hero__shadow {
+  fill: var(--color-ground-bottom);
+}
+.hero__splash {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 0.6;
 }
 .segmented {
   display: flex;
