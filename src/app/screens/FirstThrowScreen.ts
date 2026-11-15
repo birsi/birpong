@@ -2,18 +2,20 @@ import type { CpuLevel } from "../../domain/cpu";
 import { beats, initialState, reduce, type Rps, type Side } from "../../domain/engine";
 import { createRng } from "../../domain/throw";
 import { levelLabel } from "../../match/narration";
+import { RPS_CHOICES, RpsDuel } from "../../ui/components/RpsDuel";
 import { button, el } from "../../ui/dom";
 import type { Navigator, Screen } from "../types";
 
-const CHOICES: Rps[] = ["rock", "paper", "scissors"];
+/** How long the CPU "thinks" before the countdown starts. */
+const CPU_THINK_MS = 700;
 
 /** Rock, paper, scissors against the CPU, best of one; a tie is replayed. */
 export class FirstThrowScreen implements Screen {
   private readonly rng = createRng(Date.now());
-  private readonly choices = new Map<Rps, HTMLButtonElement>();
-  private readonly cpuPick = el("div", "pick pick--cpu", "?");
+  private readonly duel: RpsDuel;
   private readonly verdict = el("section", "card card--verdict");
   private locked = false;
+  private timer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     root: HTMLElement,
@@ -30,47 +32,61 @@ export class FirstThrowScreen implements Screen {
       button("btn", "Back", () => nav.home()),
     );
 
-    const you = el("section", "card");
-    const youHead = el("div", "who");
-    youHead.append(el("span", "tag", "YOU"), el("span", "who__name", nickname));
-    const picks = el("div", "picks");
-    for (const choice of CHOICES) {
-      const b = button("pick", choice.toUpperCase(), () => this.play(choice));
-      this.choices.set(choice, b);
-      picks.append(b);
-    }
-    you.append(youHead, picks);
+    this.duel = new RpsDuel({
+      you: nickname,
+      them: levelLabel(level),
+      themTag: "CPU",
+      onPick: (choice) => this.play(choice),
+    });
+    this.duel.setHint("Your move: pick rock, paper or scissors below.");
+    this.duel.setEnabled(true);
 
-    const cpu = el("section", "card card--cpu");
-    const cpuHead = el("div", "who");
-    cpuHead.append(el("span", "tag tag--b", "CPU"), el("span", "who__name", levelLabel(level)));
-    cpu.append(cpuHead, this.cpuPick);
-
-    const row = el("div", "grid grid--rps");
-    row.append(you, cpu);
     this.verdict.hidden = true;
     page.append(
       header,
       el("h1", "display", "WHO THROWS FIRST"),
-      el("p", "muted", "Rock, paper, scissors. Best of one. A tie is replayed."),
-      row,
+      el(
+        "p",
+        "muted",
+        "Rock beats scissors, scissors beats paper, paper beats rock. The winner throws first; a tie is replayed.",
+      ),
+      this.duel.element,
       this.verdict,
     );
     root.replaceChildren(page);
   }
 
-  destroy(): void {}
+  destroy(): void {
+    this.duel.destroy();
+    if (this.timer) clearTimeout(this.timer);
+  }
 
   private play(mine: Rps): void {
     if (this.locked) return;
-    const theirs = this.rng.pick(CHOICES);
-    for (const [choice, b] of this.choices) b.ariaPressed = String(choice === mine);
-    this.cpuPick.textContent = theirs.toUpperCase();
-    this.cpuPick.classList.add("pick--shown");
-
-    const decided = reduce(initialState(), { type: "rps", choices: [mine, theirs] });
-    if (decided.phase === "rps") return this.showTie();
     this.locked = true;
+    this.verdict.hidden = true;
+    this.duel.setEnabled(false);
+    this.duel.show(mine, false);
+    this.duel.setHint(`You picked ${mine}. The CPU is choosing…`);
+
+    this.timer = setTimeout(() => void this.settle(mine), CPU_THINK_MS);
+  }
+
+  private async settle(mine: Rps): Promise<void> {
+    const theirs = this.rng.pick([...RPS_CHOICES]);
+    const decided = reduce(initialState(), { type: "rps", choices: [mine, theirs] });
+    const tie = decided.phase === "rps";
+    const outcome = tie ? "tie" : decided.first === 0 ? "win" : "lose";
+    this.duel.setHint("");
+    if (!(await this.duel.reveal(mine, theirs, outcome))) return;
+
+    if (tie) {
+      this.locked = false;
+      this.duel.setEnabled(true);
+      this.duel.setHint(`Both picked ${mine}. Pick again.`);
+      return this.showTie();
+    }
+    this.duel.setHint(`${mine} against ${theirs}.`);
     this.showWinner(decided.first as Side, mine, theirs);
   }
 
@@ -78,7 +94,7 @@ export class FirstThrowScreen implements Screen {
     this.verdict.hidden = false;
     this.verdict.replaceChildren(
       el("h2", "display display--small", "TIE"),
-      el("p", "muted", "Pick again."),
+      el("p", "muted", "Same pick on both sides. Choose again to settle it."),
     );
   }
 

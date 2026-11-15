@@ -1,10 +1,10 @@
 import type { Rps } from "../../domain/engine";
 import { inviteLink } from "../../online/roomCode";
 import type { OnlineSession } from "../../online/OnlineSession";
+import { RpsDuel } from "../../ui/components/RpsDuel";
 import { button, el } from "../../ui/dom";
 import type { Navigator, Screen } from "../types";
 
-const CHOICES: Rps[] = ["rock", "paper", "scissors"];
 /** A guest that hears nothing from the host for this long gives up. */
 const JOIN_TIMEOUT_MS = 12_000;
 
@@ -20,8 +20,11 @@ const MATCH_RULES: [string, string][] = [
 /** An online room before the match: who is here, rock, paper, scissors, and the rules. */
 export class LobbyScreen implements Screen {
   private readonly seats = el("div", "grid grid--2");
-  private readonly picks = new Map<Rps, HTMLButtonElement>();
-  private readonly status = el("p", "muted");
+  private readonly duel: RpsDuel;
+  /** Both picks were in at the last render, so a new pair means a new reveal. */
+  private bothPicked = false;
+  /** The countdown and reveal are playing; the result waits until they finish. */
+  private revealing = false;
   private readonly start = button("btn btn--primary btn--block", "START MATCH", () =>
     this.session.start(),
   );
@@ -34,6 +37,12 @@ export class LobbyScreen implements Screen {
     private readonly session: OnlineSession,
     private readonly code: string,
   ) {
+    this.duel = new RpsDuel({
+      you: session.nickname,
+      them: session.opponentName ?? "Waiting…",
+      onPick: (choice) => this.session.pickRps(choice),
+    });
+
     const page = el("div", "page");
     const header = el("header", "topbar");
     const brand = el("div", "inline");
@@ -62,6 +71,7 @@ export class LobbyScreen implements Screen {
   }
 
   destroy(): void {
+    this.duel.destroy();
     for (const off of this.off) off();
     if (this.timer) clearTimeout(this.timer);
   }
@@ -88,17 +98,10 @@ export class LobbyScreen implements Screen {
     const row = el("div", "grid grid--2");
 
     const first = el("section", "card card--panel-wide");
-    const picks = el("div", "picks");
-    for (const choice of CHOICES) {
-      const b = button("pick", choice.toUpperCase(), () => this.session.pickRps(choice));
-      this.picks.set(choice, b);
-      picks.append(b);
-    }
     first.append(
       el("h2", "display", "WHO THROWS FIRST"),
-      el("p", "muted", "Rock, paper, scissors. Best of one."),
-      picks,
-      this.status,
+      el("p", "muted", "Rock, paper, scissors. Best of one; the winner throws first."),
+      this.duel.element,
     );
 
     const rules = el("section", "card card--panel-wide");
@@ -137,21 +140,42 @@ export class LobbyScreen implements Screen {
 
     const { mine, theirs, first } = session.rps;
     const connected = session.status === "connected";
-    for (const [choice, b] of this.picks) {
-      b.ariaPressed = String(choice === mine);
-      b.disabled = !connected || first !== null;
-    }
+    this.duel.setName(opponent ?? "Waiting…");
 
-    this.status.textContent = this.rpsMessage(connected, mine, theirs, first);
+    const both = mine !== null && theirs !== null;
+    if (both && !this.bothPicked) this.playReveal(mine, theirs, first);
+    else if (!both) {
+      this.revealing = false;
+      this.duel.show(mine, theirs !== null);
+    }
+    this.bothPicked = both;
+
+    // Until the reveal has played, the result stays a secret.
+    const decided = first !== null && !this.revealing;
+    // Open while you have not picked, or after a tie.
+    const canPick = first === null && (mine === null || theirs !== null);
+    this.duel.setEnabled(connected && !this.revealing && canPick);
+    this.duel.setHint(this.revealing ? "" : this.rpsMessage(connected, mine, theirs, first));
     this.start.hidden = false;
     if (session.role === "host") {
-      this.start.disabled = first === null || !connected;
+      this.start.disabled = !decided || !connected;
       this.start.textContent = "START MATCH";
     } else {
       this.start.disabled = true;
-      this.start.textContent =
-        first === null ? "WAITING FOR THE FIRST THROW" : "WAITING FOR THE HOST TO START";
+      this.start.textContent = decided
+        ? "WAITING FOR THE HOST TO START"
+        : "WAITING FOR THE FIRST THROW";
     }
+  }
+
+  private playReveal(mine: Rps, theirs: Rps, first: 0 | 1 | null): void {
+    this.revealing = true;
+    const outcome = first === null ? "tie" : first === this.session.localSide ? "win" : "lose";
+    void this.duel.reveal(mine, theirs, outcome).then((finished) => {
+      if (!finished) return;
+      this.revealing = false;
+      this.render();
+    });
   }
 
   private rpsMessage(
@@ -167,8 +191,8 @@ export class LobbyScreen implements Screen {
       return `${mine} against ${theirs}: ${youFirst ? "you throw" : `${name} throws`} first.`;
     }
     if (mine !== null && theirs !== null) return `Both picked ${mine}. Tie, pick again.`;
-    if (mine !== null) return `You picked ${mine}. Waiting for ${name}.`;
-    if (theirs !== null) return `${name} has picked. Your turn.`;
-    return "Pick rock, paper or scissors.";
+    if (mine !== null) return `You picked ${mine}. Waiting for ${name} to pick…`;
+    if (theirs !== null) return `${name} has picked. Your move: pick one below.`;
+    return "Your move: pick rock, paper or scissors below.";
   }
 }

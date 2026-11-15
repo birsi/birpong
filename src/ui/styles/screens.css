@@ -29,14 +29,6 @@
 .grid--2 {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
-.grid--rps {
-  grid-template-columns: 3fr 1.3fr;
-}
-@media (max-width: 720px) {
-  .grid--rps {
-    grid-template-columns: 1fr;
-  }
-}
 .display {
   margin: 0;
   font-family: "Silkscreen", "JetBrains Mono", monospace;
@@ -50,6 +42,39 @@
   font-size: clamp(40px, 9vw, 72px);
   font-weight: 700;
   letter-spacing: 0.12em;
+}
+/* Each letter cycles through the palette a beat after the one before it, so colour ripples across. */
+.hero__letter {
+  display: inline-block;
+  animation: hero-letter 3.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.14s);
+}
+@keyframes hero-letter {
+  0%,
+  100% {
+    color: var(--color-text-strong);
+    transform: translateY(0);
+    filter: none;
+  }
+  18% {
+    color: var(--color-accent);
+    transform: translateY(-0.08em);
+    filter: drop-shadow(0 0 0.18em color-mix(in srgb, var(--color-accent) 70%, transparent));
+  }
+  36% {
+    color: var(--color-brand-aws);
+    transform: translateY(0);
+    filter: drop-shadow(0 0 0.14em color-mix(in srgb, var(--color-brand-aws) 60%, transparent));
+  }
+  55% {
+    color: var(--color-text-strong);
+    filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__letter {
+    animation: none;
+  }
 }
 .display--small {
   font-size: 22px;
@@ -111,6 +136,39 @@
   fill: var(--color-surface);
   stroke: var(--color-text-strong);
   stroke-width: 0.8;
+  transition:
+    opacity 0.5s ease,
+    fill 0.15s ease,
+    stroke 0.15s ease;
+}
+.hero__cup--sunk {
+  fill: var(--color-accent);
+  stroke: var(--color-text-faint);
+  opacity: 0.18;
+  transition:
+    opacity 0.9s ease 0.25s,
+    fill 0.15s ease,
+    stroke 0.9s ease 0.25s;
+}
+/* Ball, shadow and splash are drawn at the origin and moved by the rally animation. */
+.hero__ball,
+.hero__shadow,
+.hero__splash {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.hero__ball {
+  fill: var(--color-text-strong);
+}
+.hero__shadow {
+  fill: var(--color-ground-bottom);
+}
+.hero__splash {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 0.6;
 }
 .segmented {
   display: flex;
@@ -195,23 +253,225 @@
   border-color: var(--color-accent);
   font-weight: 700;
 }
-.pick--cpu {
-  cursor: default;
-  margin-top: 12px;
-  color: var(--color-text-muted);
-}
-.pick--shown {
-  color: var(--color-text-strong);
-  border-color: var(--color-brand-aws);
-  font-weight: 700;
-}
-.card--cpu {
+
+/* Rock, paper, scissors duel */
+.rps {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+.rps__hint {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--color-text);
+}
+.rps--your-move .rps__hint {
+  color: var(--color-accent);
+  animation: rps-hint 1.6s ease-in-out infinite;
+}
+.rps__stage {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   gap: 12px;
 }
-.card--cpu .who + .pick {
-  margin-top: 0;
+.rps__side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.rps__who {
+  max-width: 100%;
+}
+.rps__who .who__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rps__hand {
+  width: clamp(72px, 18vw, 104px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--color-text-faint);
+  border-radius: 50%;
+  background: var(--color-ground-top);
+  color: var(--color-text-muted);
+  font-size: clamp(34px, 8vw, 50px);
+  line-height: 1;
+  transition:
+    border-color 0.2s,
+    opacity 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s;
+}
+.rps__glyph {
+  display: inline-block;
+}
+/* The other side's hand faces you; the "?" stays readable. */
+.rps__side--them .rps__glyph--hand {
+  transform: scaleX(-1);
+}
+.rps__hand--locked {
+  border-style: solid;
+  border-color: var(--color-text-muted);
+  color: var(--color-text-strong);
+}
+.rps__side--them .rps__hand--locked {
+  border-color: var(--color-brand-aws);
+}
+.rps__hand--thinking {
+  animation: rps-think 1.2s ease-in-out infinite;
+}
+.rps__hand--pump {
+  border-style: solid;
+  border-color: var(--color-text-muted);
+  animation: rps-pump 0.42s ease-in-out 3;
+}
+.rps__hand--pop {
+  border-style: solid;
+  border-color: var(--color-text);
+  animation: rps-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+.rps__hand--win {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  transform: scale(1.08);
+}
+.rps__hand--lose {
+  opacity: 0.35;
+  transform: scale(0.9);
+}
+.rps__hand--tie {
+  border-color: var(--color-brand-aws);
+  animation: shake 0.35s;
+}
+.rps__badge {
+  min-height: 1.2em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+}
+.rps__side--them .rps__badge {
+  color: var(--color-brand-aws);
+}
+.rps__call {
+  min-width: 5.5em;
+  text-align: center;
+  font-family: "Silkscreen", "JetBrains Mono", monospace;
+  font-size: clamp(14px, 3.4vw, 22px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+.rps__call--beat {
+  color: var(--color-text-strong);
+  animation: rps-call 0.42s ease-out;
+}
+.rps__pick {
+  flex-direction: column;
+  gap: 4px;
+  transition:
+    transform 0.15s,
+    border-color 0.15s,
+    background 0.15s;
+}
+.rps__pick-glyph {
+  font-size: 28px;
+  line-height: 1;
+}
+.rps__pick-label {
+  font-size: 12px;
+}
+.rps__pick:not(:disabled):hover {
+  transform: translateY(-3px);
+  border-color: var(--color-accent);
+  color: var(--color-text-strong);
+}
+.rps__pick:not(:disabled):active {
+  transform: translateY(0) scale(0.96);
+}
+/* While it is your move, the picks glow one after another to ask for a choice. */
+.rps--your-move .rps__pick {
+  animation: rps-ask 1.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.2s);
+}
+.rps--your-move .rps__pick:hover {
+  animation: none;
+}
+@keyframes rps-hint {
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes rps-think {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  25% {
+    transform: translateY(-4px) rotate(-6deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(6deg);
+  }
+}
+@keyframes rps-pump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-14px) rotate(-8deg);
+  }
+}
+@keyframes rps-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes rps-call {
+  0% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes rps-ask {
+  0%,
+  60%,
+  100% {
+    border-color: var(--color-text-muted);
+    box-shadow: none;
+  }
+  25% {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rps--your-move .rps__hint,
+  .rps--your-move .rps__pick,
+  .rps__hand--thinking,
+  .rps__hand--pump,
+  .rps__hand--pop,
+  .rps__hand--tie,
+  .rps__call--beat {
+    animation: none;
+  }
+  .rps__hand,
+  .rps__pick {
+    transition: none;
+  }
 }
 .card--verdict {
   display: flex;
@@ -224,14 +484,6 @@
 }
 .card--verdict[hidden] {
   display: none;
-}
-.grid--rps .card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.grid--rps .pick--cpu {
-  margin-top: 0;
 }
 .page > .card {
   flex: none;
